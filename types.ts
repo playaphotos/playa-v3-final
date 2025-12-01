@@ -1,10 +1,3 @@
-export interface UserProfile {
-  uid: string;
-  email: string | null;
-  displayName: string | null;
-  role: 'admin' | 'attendee' | 'agency';
-}
-
 export const RoutePaths = {
   HOME: '/',
   LOGIN: '/login',
@@ -13,57 +6,32 @@ export const RoutePaths = {
   PRIVACY: '/privacy',
   PRICING: '/pricing',
   FEATURES: '/features',
-  
-  // App / Attendee
+  EVENT_SLUG: '/:agencySlug/:eventSlug',
   APP_GALLERY: '/gallery/:eventId',
-  
-  // Admin / Agency
+  CHECKOUT_SUCCESS: '/checkout/success',
   ADMIN_DASHBOARD: '/admin/dashboard',
   ADMIN_EVENTS: '/admin/events',
   ADMIN_EVENT_DETAIL: '/admin/events/:eventId',
-  ADMIN_SETTINGS: '/admin/settings',
-  
-  // Legacy/Redirects
-  SELFIE: '/selfie'
+  ADMIN_SETTINGS: '/admin/settings'
 } as const;
-
-export interface NavItem {
-  label: string;
-  path: string;
-  icon?: string;
-}
 
 export interface Photo {
   id: string;
   originalUrl: string;
-  watermarkedUrl: string; // Heavy watermark for display
+  watermarkedUrl: string;
   thumbnailUrl?: string;
   eventId: string;
-  embedding?: number[]; // For face search
+  embedding?: number[];
   price?: number;
 }
 
+export type ProductType = 'social' | 'print' | 'original' | 'remix';
+
 export interface CartItem {
+  id: string;
   photoId: string;
   thumbnailUrl: string;
-  type: 'digital' | 'print' | 'remix';
+  type: ProductType;
   price: number;
-  quantity: number;
-}
-
-export interface EventPricing {
-  creditPrice: number;
-  socialPrice: number;
-  printPrice: number;
-}
-
-export interface Event {
-  id: string;
-  name: string;
-  date: string;
-  slug: string;
-  coverImage?: string;
-  agencyId: string;
-  status: 'active' | 'archived' | 'draft';
-  photoCount: number;
+  label: string;
 }
