@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { RoutePaths } from './types';
@@ -18,18 +17,11 @@ import Success from './pages/Success';
 import EventsManager from './pages/admin/EventsManager';
 import EventUploadManager from './pages/admin/EventUploadManager';
 import Documentation from './pages/admin/Documentation';
+import Settings from './pages/admin/Settings'; // IMPORT THE REAL SETTINGS PAGE
 
-// NEW: Real Marketing Pages
+// Marketing Pages
 import Features from './pages/Features';
 import Pricing from './pages/Pricing';
-
-// Placeholder for Settings
-const PlaceholderPage: React.FC<{ title: string }> = ({ title }) => (
-  <div className="py-24 text-center">
-    <h1 className="text-4xl font-bold text-slate-300 mb-4">Coming Soon</h1>
-    <p className="text-xl text-slate-500">{title}</p>
-  </div>
-);
 
 const AdminDashboardPlaceholder = () => (
   <div>
@@ -45,7 +37,9 @@ const AdminDashboardPlaceholder = () => (
 const App: React.FC = () => {
   return (
     <CartProvider>
+      {/* PWA Install Listener & UI */}
       <InstallPwa />
+      
       <HashRouter>
         <Routes>
           {/* Public Routes */}
@@ -59,18 +53,24 @@ const App: React.FC = () => {
           <Route path={RoutePaths.PRICING} element={<PublicLayout><Pricing /></PublicLayout>} />
           <Route path={RoutePaths.FEATURES} element={<PublicLayout><Features /></PublicLayout>} />
 
-          {/* APP ROUTES */}
+          {/* ATTENDEE EXPERIENCE ROUTES */}
+          {/* Direct ID access */}
           <Route path={RoutePaths.APP_GALLERY} element={<AppLayout><EventGallery /></AppLayout>} />
+          {/* Slug access */}
           <Route path={RoutePaths.EVENT_SLUG} element={<AppLayout><EventGallery /></AppLayout>} />
+          {/* Checkout Success */}
           <Route path={RoutePaths.CHECKOUT_SUCCESS} element={<PublicLayout><Success /></PublicLayout>} />
 
-          {/* ADMIN ROUTES */}
+          {/* ADMIN ROUTES - Wrapped in AgencySidebarLayout */}
           <Route path={RoutePaths.ADMIN_DASHBOARD} element={<AgencySidebarLayout><AdminDashboardPlaceholder /></AgencySidebarLayout>} />
           <Route path={RoutePaths.ADMIN_EVENTS} element={<AgencySidebarLayout><EventsManager /></AgencySidebarLayout>} />
           <Route path={RoutePaths.ADMIN_EVENT_DETAIL} element={<AgencySidebarLayout><EventUploadManager /></AgencySidebarLayout>} />
           <Route path="/admin/documentation" element={<AgencySidebarLayout><Documentation /></AgencySidebarLayout>} />
-          <Route path="/admin/settings" element={<AgencySidebarLayout><PlaceholderPage title="Settings" /></AgencySidebarLayout>} />
           
+          {/* UPDATED: Uses the real Settings component now */}
+          <Route path="/admin/settings" element={<AgencySidebarLayout><Settings /></AgencySidebarLayout>} />
+          
+          {/* Safety Redirects */}
           <Route path="/selfie" element={<Navigate to="/" replace />} />
           <Route path="*" element={<Navigate to={RoutePaths.HOME} replace />} />
         </Routes>

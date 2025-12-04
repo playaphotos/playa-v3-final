@@ -1,3 +1,7 @@
+import Stripe from 'stripe';
+// Initialize Stripe (We use a dummy key for build, but you set the real one in Firebase Env)
+const stripe = new Stripe(functions.config().stripe?.secret || 'sk_test_PLACEHOLDER', { apiVersion: '2024-11-20.acacia' });
+
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 import axios from 'axios';
@@ -108,4 +112,47 @@ export const cleanupStorage = functions.pubsub.schedule('every 24 hours').onRun(
   await Promise.all(promises);
   console.log(`Cleaned up ${snapshot.size} expired albums.`);
   return null;
+});
+
+// --- 4. Create Stripe Checkout Session ---
+export const createStripeCheckout = functions.https.onCall(async (data, context) => {
+  if (!context.auth) throw new functions.https.HttpsError('unauthenticated', 'Must be logged in');
+  
+  const { cartItems, agencyId, returnUrl } = data;
+  
+  // 1. Format Line Items for Stripe
+  const lineItems = cartItems.map((item: any) => ({
+    price_data: {
+      currency: 'usd',
+      product_data: {
+        name: item.label, // e.g., "Social Download"
+        images: [item.thumbnailUrl],
+      },
+      unit_amount: Math.round(item.price * 100), // Stripe expects cents
+    },
+    quantity: 1,
+  }));
+
+  // 2. Create Session
+  try {
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: lineItems,
+      mode: 'payment',
+      success_url: `${returnUrl}/checkout/success`,
+      cancel_url: `${returnUrl}`,
+      metadata: {
+        agencyId,
+        customerEmail: context.auth.token.email || 'guest',
+        cartItems: JSON.stringify(cartItems) // Save cart to metadata for fulfillment later
+      },
+      // In a real Connect app, you would add: 
+      // payment_intent_data: { transfer_data: { destination: agencyStripeAccountId } }
+    });
+
+    return { url: session.url };
+  } catch (error: any) {
+    console.error("Stripe Error:", error);
+    throw new functions.https.HttpsError('internal', error.message);
+  }
 });
