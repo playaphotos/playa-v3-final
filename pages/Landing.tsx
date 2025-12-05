@@ -22,7 +22,7 @@ const Landing: React.FC = () => {
     <div className="flex flex-col">
       {/* Hero */}
       <section className="relative bg-slate-900 py-32 text-center">
-        <h1 className="text-4xl font-extrabold text-white mb-6">Your Memories. Instantly.</h1>
+        <h1 className="text-4xl font-extrabold text-white mb-6">Your Memories. Instantly. v3</h1>
         <div className="max-w-md mx-auto relative">
           <input type="text" placeholder="Search event..." className="w-full rounded-full py-3 px-6" />
           <button className="absolute right-2 top-2 p-1 bg-indigo-600 rounded-full text-white"><Search size={20} /></button>
