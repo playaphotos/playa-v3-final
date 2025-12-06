@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Camera } from 'lucide-react';
-
 const Footer = () => {
   const year = new Date().getFullYear();
   return (
@@ -16,7 +15,7 @@ const Footer = () => {
           <div><h3 className="text-white font-bold mb-4">For Photographers</h3><ul className="space-y-3 text-sm"><li><Link to="/agency" className="text-indigo-400 font-bold hover:text-white">Sell with Us</Link></li><li><Link to="/login" className="hover:text-indigo-400">Agency Login</Link></li></ul></div>
           <div><h3 className="text-white font-bold mb-4">Legal</h3><ul className="space-y-3 text-sm"><li><Link to="/privacy" className="hover:text-indigo-400">Privacy Policy</Link></li><li><Link to="/terms" className="hover:text-indigo-400">Terms</Link></li></ul></div>
         </div>
-        <div className="border-t border-slate-800 mt-12 pt-8 text-center text-sm text-slate-600"><p>&copy; {year} Playa Photos. All rights reserved. (v3.4 Final)</p></div>
+        <div className="border-t border-slate-800 mt-12 pt-8 text-center text-sm text-slate-600"><p>&copy; {year} Playa Photos. All rights reserved. (v3.5 Final)</p></div>
       </div>
     </footer>
   );

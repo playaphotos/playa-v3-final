@@ -6,7 +6,6 @@ import { db } from '../lib/firebase';
 
 const Landing: React.FC = () => {
   const [recentEvents, setRecentEvents] = useState<any[]>([]);
-
   useEffect(() => {
     const fetchEvents = async () => {
       try {
@@ -17,7 +16,6 @@ const Landing: React.FC = () => {
     };
     fetchEvents();
   }, []);
-
   return (
     <div className="flex flex-col min-h-screen font-sans">
       <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden bg-slate-900">
@@ -33,13 +31,11 @@ const Landing: React.FC = () => {
             Stop Scrolling. <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400">Start Reliving.</span>
           </h1>
-          <p className="max-w-2xl mx-auto text-xl text-slate-300 mb-10 leading-relaxed">
-            We use Face Search AI to instantly find you in thousands of event photos. No tagging, no searching—just your magic moments, delivered instantly.
-          </p>
+          <p className="max-w-2xl mx-auto text-xl text-slate-300 mb-10 leading-relaxed">We use Face Search AI to instantly find you in thousands of event photos. No tagging, no searching—just your magic moments, delivered instantly.</p>
           <div className="max-w-md mx-auto relative group">
             <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200"></div>
             <div className="relative">
-               <input type="text" placeholder="Find your event (e.g. Summer Gala)..." className="w-full bg-white text-slate-900 rounded-full py-4 pl-6 pr-14 text-lg shadow-xl focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+               <input type="text" placeholder="Find your event..." className="w-full bg-white text-slate-900 rounded-full py-4 pl-6 pr-14 text-lg shadow-xl focus:outline-none focus:ring-2 focus:ring-indigo-500" />
                <button className="absolute right-2 top-2 p-2 bg-indigo-600 text-white rounded-full hover:bg-indigo-500 transition-colors shadow-lg"><Search size={24} /></button>
             </div>
           </div>
@@ -71,13 +67,11 @@ const Landing: React.FC = () => {
         </div>
       </section>
       <section className="py-24 bg-white border-t border-slate-100">
-         <div className="max-w-7xl mx-auto px-6">
-            <div className="grid md:grid-cols-3 gap-12 text-center">
+         <div className="max-w-7xl mx-auto px-6"><div className="grid md:grid-cols-3 gap-12 text-center">
                <div className="p-6"><div className="w-16 h-16 mx-auto bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mb-6"><ShieldCheck size={32} /></div><h3 className="text-xl font-bold mb-3">Privacy First</h3><p className="text-slate-500">Processed locally on your device.</p></div>
                <div className="p-6"><div className="w-16 h-16 mx-auto bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center mb-6"><Sparkles size={32} /></div><h3 className="text-xl font-bold mb-3">AI Magic</h3><p className="text-slate-500">Remix your photos instantly.</p></div>
                <div className="p-6"><div className="w-16 h-16 mx-auto bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center mb-6"><Zap size={32} /></div><h3 className="text-xl font-bold mb-3">Instant Delivery</h3><p className="text-slate-500">No waiting. Immediate download.</p></div>
-            </div>
-         </div>
+         </div></div>
       </section>
     </div>
   );

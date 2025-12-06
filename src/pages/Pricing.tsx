@@ -1,12 +1,10 @@
 import React from 'react';
 import { Check, Star } from 'lucide-react';
-
 const tiers = [
   { name: 'Single Photo', price: '$4.99', desc: 'Perfect for that one amazing shot.', features: ['High Resolution', 'Print License', 'Instant Download', 'No Watermark'], featured: false, color: 'bg-white', btn: 'bg-slate-100 text-slate-900 hover:bg-slate-200' },
   { name: 'Event Bundle', price: '$29.99', desc: 'Get every photo you appear in.', features: ['All Your Photos', 'Face Recognition Search', 'Priority Support', 'Forever Cloud Backup'], featured: true, color: 'bg-slate-900 text-white', btn: 'bg-indigo-600 text-white hover:bg-indigo-500' },
   { name: 'AI Remix', price: '$0.99', desc: 'Transform your look with magic.', features: ['1 AI Generation', 'Cyberpunk / Art Styles', 'Fun Social Share', 'Unique Result'], featured: false, color: 'bg-gradient-to-br from-purple-50 to-pink-50 border-purple-100', btn: 'bg-purple-600 text-white hover:bg-purple-700' },
 ];
-
 const Pricing = () => {
   return (
     <div className="bg-slate-50 py-24 sm:py-32">

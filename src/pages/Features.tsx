@@ -1,15 +1,11 @@
 import React from 'react';
 import { ShieldCheck, Wand2, Smartphone, Zap, Lock, Share2, Layers, Heart } from 'lucide-react';
-
 const Features = () => {
   return (
     <div className="bg-white">
       <div className="relative bg-slate-900 py-24 lg:py-32 overflow-hidden">
          <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-indigo-900/50 to-transparent"></div>
-         <div className="relative max-w-7xl mx-auto px-6 lg:px-8 text-center">
-            <h2 className="text-indigo-400 font-semibold tracking-wide uppercase text-sm mb-4">Why Playa Photos?</h2>
-            <p className="text-4xl sm:text-6xl font-extrabold text-white tracking-tight mb-8">More than just <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">files.</span><br/>It's an experience.</p>
-         </div>
+         <div className="relative max-w-7xl mx-auto px-6 lg:px-8 text-center"><h2 className="text-indigo-400 font-semibold tracking-wide uppercase text-sm mb-4">Why Playa Photos?</h2><p className="text-4xl sm:text-6xl font-extrabold text-white tracking-tight mb-8">More than just <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">files.</span><br/>It's an experience.</p></div>
       </div>
       <div className="py-24 max-w-7xl mx-auto px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
