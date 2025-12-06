@@ -1,48 +1,58 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { RoutePaths } from '../types';
-import { Download } from 'lucide-react';
+import { Camera } from 'lucide-react';
 
-export const Footer: React.FC = () => {
+const Footer = () => {
   const year = new Date().getFullYear();
 
-  const handleInstallClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    // Dispatch event to InstallPwa component
-    window.dispatchEvent(new Event('pwa-install-trigger'));
-  };
-
   return (
-    <footer className="bg-slate-50 border-t border-slate-200 mt-auto">
-      <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+    <footer className="bg-slate-900 border-t border-slate-800 text-slate-300">
+      <div className="max-w-7xl mx-auto px-6 py-12 lg:py-16">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
           
-          <div className="text-slate-500 text-sm">
-            © {year} Playa Photos. All rights reserved (v2.0 Live)
+          <div className="col-span-1 md:col-span-1">
+            <Link to="/" className="flex items-center gap-2 mb-4">
+              <Camera className="w-8 h-8 text-brand-500" />
+              <span className="text-2xl font-bold text-white tracking-tight">Playa Photos</span>
+            </Link>
+            <p className="text-sm text-slate-500 leading-relaxed">
+              The AI-powered event photography platform. Find your face, remix your style, keep the memory.
+            </p>
           </div>
 
-          <div className="flex flex-wrap justify-center gap-6 text-sm font-medium text-slate-500">
-            <button 
-              onClick={handleInstallClick} 
-              className="flex items-center gap-1.5 hover:text-brand-600 transition-colors"
-            >
-              <Download size={16} />
-              <span>Install App</span>
-            </button>
-            
-            <Link to={RoutePaths.PRIVACY} className="hover:text-brand-600 transition-colors">
-              Privacy Policy
-            </Link>
-            <Link to={RoutePaths.TERMS} className="hover:text-brand-600 transition-colors">
-              Terms of Service
-            </Link>
-            <Link to={RoutePaths.AGENCY_LANDING} className="hover:text-brand-600 transition-colors">
-              Agency Partner Program
-            </Link>
+          <div>
+            <h3 className="text-white font-bold mb-4">For Guests</h3>
+            <ul className="space-y-3 text-sm">
+              <li><Link to="/" className="hover:text-brand-400 transition-colors">Find My Photos</Link></li>
+              <li><Link to="/features" className="hover:text-brand-400 transition-colors">How it Works</Link></li>
+              <li><Link to="/pricing" className="hover:text-brand-400 transition-colors">Pricing</Link></li>
+            </ul>
           </div>
 
+          <div>
+            <h3 className="text-white font-bold mb-4">For Photographers</h3>
+            <ul className="space-y-3 text-sm">
+              {/* THIS IS THE FIX: Link explicitly to the Agency Landing Page */}
+              <li><Link to="/agency" className="text-brand-400 font-bold hover:text-white transition-colors">Sell with Us</Link></li>
+              <li><Link to="/login" className="hover:text-brand-400 transition-colors">Agency Login</Link></li>
+              <li><Link to="/admin/documentation" className="hover:text-brand-400 transition-colors">Documentation</Link></li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="text-white font-bold mb-4">Legal</h3>
+            <ul className="space-y-3 text-sm">
+              <li><Link to="/privacy" className="hover:text-brand-400 transition-colors">Privacy Policy</Link></li>
+              <li><Link to="/terms" className="hover:text-brand-400 transition-colors">Terms of Service</Link></li>
+            </ul>
+          </div>
+
+        </div>
+        <div className="border-t border-slate-800 mt-12 pt-8 text-center text-sm text-slate-600">
+          <p>&copy; {year} Playa Photos. All rights reserved. (v3.1 Live)</p>
         </div>
       </div>
     </footer>
   );
 };
+export default Footer;

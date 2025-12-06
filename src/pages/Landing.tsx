@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, ArrowRight, Camera } from 'lucide-react';
+import { Search, ArrowRight, Camera, Sparkles, Zap, ShieldCheck } from 'lucide-react';
 import { collection, query, where, getDocs, limit } from 'firebase/firestore'; 
 import { db } from '../lib/firebase';
 
@@ -19,35 +19,72 @@ const Landing: React.FC = () => {
   }, []);
 
   return (
-    <div className="flex flex-col">
-      {/* Hero */}
-      <section className="relative bg-slate-900 py-32 text-center">
-        <h1 className="text-4xl font-extrabold text-white mb-6">Your Memories. Instantly. v3</h1>
-        <div className="max-w-md mx-auto relative">
-          <input type="text" placeholder="Search event..." className="w-full rounded-full py-3 px-6" />
-          <button className="absolute right-2 top-2 p-1 bg-indigo-600 rounded-full text-white"><Search size={20} /></button>
+    <div className="flex flex-col min-h-screen">
+      {/* HERO SECTION */}
+      <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden bg-slate-900">
+        <div className="absolute top-0 left-0 w-full h-full overflow-hidden opacity-30 pointer-events-none">
+           <div className="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-brand-500 blur-3xl mix-blend-screen"></div>
+           <div className="absolute top-1/2 right-0 w-96 h-96 rounded-full bg-purple-500 blur-3xl mix-blend-screen"></div>
+        </div>
+        
+        <div className="relative max-w-7xl mx-auto px-6 text-center z-10">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-900/50 border border-brand-500/30 text-brand-300 text-sm font-medium mb-6">
+            <Sparkles size={14} /> <span>The Future of Event Photography is Here</span>
+          </div>
+          <h1 className="text-5xl md:text-7xl font-extrabold text-white tracking-tight mb-8 leading-tight">
+            Stop Searching. <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 via-purple-400 to-pink-400">Start Reliving.</span>
+          </h1>
+          <p className="max-w-2xl mx-auto text-xl text-slate-300 mb-10 leading-relaxed">
+            We use AI to instantly find your face in thousands of event photos. No scrolling, no tagging—just your magic moments, delivered instantly.
+          </p>
+          
+          <div className="max-w-md mx-auto relative group">
+            <div className="absolute -inset-1 bg-gradient-to-r from-brand-500 to-purple-600 rounded-full blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200"></div>
+            <div className="relative">
+               <input type="text" placeholder="Find your event (e.g., Summer Gala)..." className="w-full bg-white text-slate-900 rounded-full py-4 pl-6 pr-14 text-lg shadow-xl focus:outline-none focus:ring-2 focus:ring-brand-500" />
+               <button className="absolute right-2 top-2 p-2 bg-brand-600 text-white rounded-full hover:bg-brand-500 transition-colors shadow-lg">
+                 <Search size={24} />
+               </button>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* GALLERIES LIST - This is what was missing */}
-      <section className="py-16 bg-white">
+      {/* GALLERIES SECTION */}
+      <section className="py-24 bg-slate-50">
         <div className="max-w-7xl mx-auto px-6">
-          <h2 className="text-2xl font-bold text-slate-900 mb-8">Active Galleries</h2>
+          <div className="flex justify-between items-end mb-12">
+            <div>
+              <h2 className="text-3xl font-bold text-slate-900">Trending Galleries</h2>
+              <p className="text-slate-500 mt-2">Find your event and start the magic.</p>
+            </div>
+            <Link to="/features" className="hidden md:flex items-center text-brand-600 font-bold hover:underline">
+              How it works <ArrowRight size={16} className="ml-1" />
+            </Link>
+          </div>
           
           {recentEvents.length === 0 ? (
-            <p className="text-center text-slate-500">No active public events found.</p>
+            <div className="text-center py-20 border-2 border-dashed border-slate-200 rounded-2xl bg-white">
+              <Camera className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+              <p className="text-xl text-slate-500">No public events active right now.</p>
+            </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {recentEvents.map((event) => (
-                <Link key={event.id} to={`/gallery/${event.id}`} className="group bg-white rounded-xl shadow border border-slate-100 overflow-hidden hover:shadow-md transition-all">
-                  <div className="h-48 bg-slate-200 flex items-center justify-center text-slate-400">
-                    <Camera size={40} />
+                <Link key={event.id} to={`/gallery/${event.id}`} className="group bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                  <div className="h-56 bg-slate-200 relative flex items-center justify-center overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-br from-brand-500/10 to-purple-500/10 group-hover:scale-105 transition-transform duration-500"></div>
+                    <Camera size={48} className="text-slate-400 relative z-10" />
                   </div>
-                  <div className="p-5">
-                    <h3 className="font-bold text-lg text-slate-900">{event.name}</h3>
-                    <p className="text-sm text-slate-500">{event.date}</p>
-                    <div className="mt-4 flex items-center text-indigo-600 text-sm font-bold">
-                      View Photos <ArrowRight className="ml-1 w-4 h-4" />
+                  <div className="p-6">
+                    <div className="flex justify-between items-start mb-2">
+                      <h3 className="font-bold text-xl text-slate-900 leading-tight group-hover:text-brand-600 transition-colors">{event.name}</h3>
+                      <span className="bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded-full">Active</span>
+                    </div>
+                    <p className="text-sm text-slate-500 mb-6">{event.date}</p>
+                    <div className="w-full bg-slate-50 hover:bg-brand-50 text-slate-700 hover:text-brand-700 font-bold py-3 rounded-xl flex items-center justify-center transition-colors">
+                      View Photos <ArrowRight className="ml-2 w-4 h-4" />
                     </div>
                   </div>
                 </Link>
@@ -55,6 +92,29 @@ const Landing: React.FC = () => {
             </div>
           )}
         </div>
+      </section>
+
+      {/* WHY US */}
+      <section className="py-24 bg-white border-t border-slate-100">
+         <div className="max-w-7xl mx-auto px-6">
+            <div className="grid md:grid-cols-3 gap-12 text-center">
+               <div className="p-6">
+                  <div className="w-16 h-16 mx-auto bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mb-6"><ShieldCheck size={32} /></div>
+                  <h3 className="text-xl font-bold mb-3">Privacy First</h3>
+                  <p className="text-slate-500">Your face data is processed locally on your device. We prioritize your privacy above all else.</p>
+               </div>
+               <div className="p-6">
+                  <div className="w-16 h-16 mx-auto bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center mb-6"><Sparkles size={32} /></div>
+                  <h3 className="text-xl font-bold mb-3">AI Magic</h3>
+                  <p className="text-slate-500">Turn a standard selfie into a cinematic masterpiece with our Remix engine.</p>
+               </div>
+               <div className="p-6">
+                  <div className="w-16 h-16 mx-auto bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center mb-6"><Zap size={32} /></div>
+                  <h3 className="text-xl font-bold mb-3">Instant Delivery</h3>
+                  <p className="text-slate-500">No waiting. Photos are delivered to your email seconds after checkout.</p>
+               </div>
+            </div>
+         </div>
       </section>
     </div>
   );

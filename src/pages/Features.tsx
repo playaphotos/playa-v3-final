@@ -1,34 +1,46 @@
 import React from 'react';
-import { ShieldCheck, Wand2, Smartphone, Zap } from 'lucide-react';
+import { ShieldCheck, Wand2, Smartphone, Zap, Lock, Share2, Layers, Heart } from 'lucide-react';
 
-const Features = () => (
-  <div className="bg-white py-24">
-    <div className="mx-auto max-w-7xl px-6 lg:px-8">
-      <div className="mx-auto max-w-2xl lg:text-center">
-        <h2 className="text-base font-semibold leading-7 text-indigo-600">Faster payments</h2>
-        <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Everything you need to sell photos</p>
+const Features = () => {
+  return (
+    <div className="bg-white">
+      {/* Hero */}
+      <div className="relative bg-slate-900 py-24 lg:py-32 overflow-hidden">
+         <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-brand-900/50 to-transparent"></div>
+         <div className="relative max-w-7xl mx-auto px-6 lg:px-8 text-center">
+            <h2 className="text-brand-400 font-semibold tracking-wide uppercase text-sm mb-4">Why Playa Photos?</h2>
+            <p className="text-4xl sm:text-6xl font-extrabold text-white tracking-tight mb-8">
+              More than just <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-purple-400">files.</span><br/>
+              It's an experience.
+            </p>
+            <p className="text-lg text-slate-300 max-w-2xl mx-auto">
+              We've rebuilt event photography from the ground up to be faster, smarter, and magical.
+            </p>
+         </div>
       </div>
-      <div className="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-4xl">
-        <dl className="grid max-w-xl grid-cols-1 gap-x-8 gap-y-10 lg:max-w-none lg:grid-cols-2 lg:gap-y-16">
-          {[
-            { name: 'Face Search', icon: ShieldCheck, desc: 'Privacy-first AI finds your photos instantly.' },
-            { name: 'AI Remix', icon: Wand2, desc: 'Turn regular selfies into magical/professional scenes.' },
-            { name: 'Mobile First', icon: Smartphone, desc: 'Works perfectly on iOS and Android without an app store.' },
-            { name: 'Instant Delivery', icon: Zap, desc: 'Photos are emailed immediately after purchase.' },
-          ].map((feature) => (
-            <div key={feature.name} className="relative pl-16">
-              <dt className="text-base font-semibold leading-7 text-gray-900">
-                <div className="absolute left-0 top-0 flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600">
-                  <feature.icon className="h-6 w-6 text-white" aria-hidden="true" />
-                </div>
-                {feature.name}
-              </dt>
-              <dd className="mt-2 text-base leading-7 text-gray-600">{feature.desc}</dd>
-            </div>
-          ))}
-        </dl>
+
+      {/* Feature Grid */}
+      <div className="py-24 max-w-7xl mx-auto px-6 lg:px-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {[
+              { icon: ShieldCheck, title: "Face Search", text: "Find yourself instantly without scrolling through thousands of photos.", color: "text-blue-500" },
+              { icon: Wand2, title: "AI Remix", text: "Transform your photo into a cyberpunk, vintage, or oil painting masterpiece.", color: "text-purple-500" },
+              { icon: Smartphone, title: "Mobile First", text: "Works perfectly on any phone. Install as an App for instant access.", color: "text-green-500" },
+              { icon: Zap, title: "Instant Access", text: "Get your full-resolution downloads immediately after purchase.", color: "text-amber-500" },
+              { icon: Lock, title: "Secure", text: "Bank-grade encryption for payments and photo storage.", color: "text-red-500" },
+              { icon: Share2, title: "Social Ready", text: "Optimized sizing for Instagram, TikTok, and Facebook Stories.", color: "text-pink-500" },
+              { icon: Layers, title: "High Res", text: "Download print-quality files up to 50MB in size.", color: "text-indigo-500" },
+              { icon: Heart, title: "Memories", text: "We keep your gallery online for 1 year, so you never lose a moment.", color: "text-rose-500" },
+            ].map((f, i) => (
+              <div key={i} className="bg-slate-50 rounded-2xl p-8 hover:bg-white hover:shadow-xl transition-all border border-slate-100 group">
+                <f.icon className={`w-10 h-10 ${f.color} mb-6 group-hover:scale-110 transition-transform`} />
+                <h3 className="font-bold text-xl text-slate-900 mb-2">{f.title}</h3>
+                <p className="text-slate-500 leading-relaxed">{f.text}</p>
+              </div>
+            ))}
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 export default Features;
