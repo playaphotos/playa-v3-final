@@ -7,12 +7,22 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      devOptions: { enabled: true },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
-        cleanupOutdatedCaches: true, // Force delete old caches
-        skipWaiting: true,
         clientsClaim: true,
+        skipWaiting: true,
+        runtimeCaching: [
+          {
+            urlPattern: /^\/index\.html$/,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'index-html',
+              expiration: {
+                maxEntries: 1,
+                maxAgeSeconds: 0, // Never cache index.html
+              },
+            },
+          },
+        ],
       },
       manifest: {
         name: 'Playa Photos',
@@ -25,9 +35,18 @@ export default defineConfig({
       }
     })
   ],
+  // Explicitly set root to current directory
+  root: '.',
   build: {
-    outDir: 'dist', // Keep this as dist, but we will force the clean below
-    emptyOutDir: true, // This tells Vite to delete the folder before building
-    sourcemap: false
-  }
+    outDir: 'dist',
+    emptyOutDir: true,
+    rollupOptions: {
+      output: {
+        // Hashing ensures browsers don't use old code
+        entryFileNames: 'assets/[name].[hash].js',
+        chunkFileNames: 'assets/[name].[hash].js',
+        assetFileNames: 'assets/[name].[hash].[ext]',
+      },
+    },
+  },
 });
