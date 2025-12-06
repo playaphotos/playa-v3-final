@@ -21,7 +21,6 @@ import Dashboard from './pages/admin/Dashboard';
 import Features from './pages/Features';
 import Pricing from './pages/Pricing';
 
-// Lazy Load Gallery
 const EventGallery = React.lazy(() => import('./pages/EventGallery'));
 
 const PageLoader = () => (
@@ -30,7 +29,7 @@ const PageLoader = () => (
   </div>
 );
 
-// --- INTERNAL LAYOUT (No external file needed) ---
+// --- INTERNAL LAYOUT (Fixes the "Missing File" Error) ---
 const AgencyLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <div className="flex h-screen bg-slate-50">
     <div className="w-64 bg-slate-900 h-full flex flex-col text-white">
@@ -65,11 +64,14 @@ const App: React.FC = () => {
           <Route path={RoutePaths.APP_GALLERY} element={<AppLayout><Suspense fallback={<PageLoader />}><EventGallery /></Suspense></AppLayout>} />
           <Route path={RoutePaths.EVENT_SLUG} element={<AppLayout><Suspense fallback={<PageLoader />}><EventGallery /></Suspense></AppLayout>} />
           <Route path={RoutePaths.CHECKOUT_SUCCESS} element={<PublicLayout><Success /></PublicLayout>} />
+          
+          {/* Admin Routes using Internal Layout */}
           <Route path={RoutePaths.ADMIN_DASHBOARD} element={<AgencyLayout><Dashboard /></AgencyLayout>} />
           <Route path={RoutePaths.ADMIN_EVENTS} element={<AgencyLayout><EventsManager /></AgencyLayout>} />
           <Route path={RoutePaths.ADMIN_EVENT_DETAIL} element={<AgencyLayout><EventUploadManager /></AgencyLayout>} />
           <Route path="/admin/documentation" element={<AgencyLayout><Documentation /></AgencyLayout>} />
           <Route path="/admin/settings" element={<AgencyLayout><AdminSettings /></AgencyLayout>} />
+          
           <Route path="/selfie" element={<Navigate to="/" replace />} />
           <Route path="*" element={<Navigate to={RoutePaths.HOME} replace />} />
         </Routes>
