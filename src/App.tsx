@@ -29,7 +29,7 @@ const PageLoader = () => (
   </div>
 );
 
-// --- INTERNAL LAYOUT (Fixes the "Missing File" Error) ---
+// --- INTERNAL AGENCY LAYOUT (Fixes the "Missing File" Error) ---
 const AgencyLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <div className="flex h-screen bg-slate-50">
     <div className="w-64 bg-slate-900 h-full flex flex-col text-white">
