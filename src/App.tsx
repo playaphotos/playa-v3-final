@@ -2,7 +2,7 @@ import React, { Suspense } from 'react';
 import { HashRouter, Routes, Route, Navigate, Link } from 'react-router-dom';
 import { RoutePaths } from './types';
 import { PublicLayout, AppLayout } from './components/Layouts';
-// import { AgencySidebarLayout } ... <-- DELETED. We define it below.
+// NOTE: We deleted the broken import. The Layout is defined below.
 import { CartProvider } from './contexts/CartContext';
 import { InstallPwa } from './components/InstallPwa';
 import { Loader2, LayoutDashboard, Image, Settings, BookOpen, LogOut } from 'lucide-react';
@@ -33,7 +33,7 @@ const PageLoader = () => (
   </div>
 );
 
-// --- INTERNAL AGENCY LAYOUT (Fixes the "Missing File" Build Error) ---
+// --- INTERNAL AGENCY LAYOUT (Fixes the Build Error) ---
 const AdminSidebar = () => (
   <div className="w-64 bg-slate-900 h-full flex flex-col text-white">
     <div className="p-6 font-bold text-xl tracking-tight">Agency Portal</div>
@@ -55,7 +55,6 @@ const AgencyLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     <main className="flex-1 overflow-y-auto relative">{children}</main>
   </div>
 );
-// -------------------------------------------------------------------
 
 const App: React.FC = () => {
   return (
@@ -79,7 +78,7 @@ const App: React.FC = () => {
           <Route path={RoutePaths.EVENT_SLUG} element={<AppLayout><Suspense fallback={<PageLoader />}><EventGallery /></Suspense></AppLayout>} />
           <Route path={RoutePaths.CHECKOUT_SUCCESS} element={<PublicLayout><Success /></PublicLayout>} />
 
-          {/* ADMIN ROUTES - USING INTERNAL LAYOUT */}
+          {/* ADMIN ROUTES */}
           <Route path={RoutePaths.ADMIN_DASHBOARD} element={<AgencyLayout><Dashboard /></AgencyLayout>} />
           <Route path={RoutePaths.ADMIN_EVENTS} element={<AgencyLayout><EventsManager /></AgencyLayout>} />
           <Route path={RoutePaths.ADMIN_EVENT_DETAIL} element={<AgencyLayout><EventUploadManager /></AgencyLayout>} />
