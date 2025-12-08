@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Camera } from 'lucide-react';
 
+// NOTE: "export const" is required for the Named Import to work
 export const Footer = () => {
   const year = new Date().getFullYear();
   return (
@@ -36,7 +37,7 @@ export const Footer = () => {
         </div>
       </div>
       <div className="text-center mt-12 pt-8 border-t border-slate-800 text-sm">
-        &copy; {year} Playa Photos. v3.8 Live
+        &copy; {year} Playa Photos. v3.9 Live
       </div>
     </footer>
   );
