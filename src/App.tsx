@@ -5,6 +5,8 @@ import { PublicLayout, AppLayout } from './components/Layouts';
 import { CartProvider } from './contexts/CartContext';
 import { InstallPwa } from './components/InstallPwa';
 import { Loader2, LayoutDashboard, Image, Settings, BookOpen, LogOut } from 'lucide-react';
+
+// Pages
 import Landing from './pages/Landing';
 import AgencyLanding from './pages/AgencyLanding';
 import Login from './pages/Login';
