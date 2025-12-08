@@ -2,7 +2,6 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Camera } from 'lucide-react';
 
-// NOTE: "export const" is required for the Named Import to work
 export const Footer = () => {
   const year = new Date().getFullYear();
   return (
