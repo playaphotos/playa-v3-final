@@ -5,8 +5,6 @@ import { PublicLayout, AppLayout } from './components/Layouts';
 import { CartProvider } from './contexts/CartContext';
 import { InstallPwa } from './components/InstallPwa';
 import { Loader2, LayoutDashboard, Image, Settings, BookOpen, LogOut } from 'lucide-react';
-
-// Pages
 import Landing from './pages/Landing';
 import AgencyLanding from './pages/AgencyLanding';
 import Login from './pages/Login';
@@ -29,7 +27,7 @@ const PageLoader = () => (
   </div>
 );
 
-// --- INTERNAL AGENCY LAYOUT (Fixes the "Missing File" Error) ---
+// INTERNAL AGENCY LAYOUT (Fixes the Vercel Build Error)
 const AgencyLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <div className="flex h-screen bg-slate-50">
     <div className="w-64 bg-slate-900 h-full flex flex-col text-white">
@@ -64,14 +62,11 @@ const App: React.FC = () => {
           <Route path={RoutePaths.APP_GALLERY} element={<AppLayout><Suspense fallback={<PageLoader />}><EventGallery /></Suspense></AppLayout>} />
           <Route path={RoutePaths.EVENT_SLUG} element={<AppLayout><Suspense fallback={<PageLoader />}><EventGallery /></Suspense></AppLayout>} />
           <Route path={RoutePaths.CHECKOUT_SUCCESS} element={<PublicLayout><Success /></PublicLayout>} />
-          
-          {/* Admin Routes using Internal Layout */}
           <Route path={RoutePaths.ADMIN_DASHBOARD} element={<AgencyLayout><Dashboard /></AgencyLayout>} />
           <Route path={RoutePaths.ADMIN_EVENTS} element={<AgencyLayout><EventsManager /></AgencyLayout>} />
           <Route path={RoutePaths.ADMIN_EVENT_DETAIL} element={<AgencyLayout><EventUploadManager /></AgencyLayout>} />
           <Route path="/admin/documentation" element={<AgencyLayout><Documentation /></AgencyLayout>} />
           <Route path="/admin/settings" element={<AgencyLayout><AdminSettings /></AgencyLayout>} />
-          
           <Route path="/selfie" element={<Navigate to="/" replace />} />
           <Route path="*" element={<Navigate to={RoutePaths.HOME} replace />} />
         </Routes>
@@ -79,4 +74,4 @@ const App: React.FC = () => {
     </CartProvider>
   );
 };
-export default App;/* Sat Dec  6 17:57:28 ESTM 2025 */
+export default App;
