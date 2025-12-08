@@ -36,7 +36,7 @@ export const Footer = () => {
         </div>
       </div>
       <div className="text-center mt-12 pt-8 border-t border-slate-800 text-sm">
-        &copy; {year} Playa Photos. v3.7 Live
+        &copy; {year} Playa Photos. v3.8 Live
       </div>
     </footer>
   );
