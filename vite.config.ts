@@ -1,52 +1,40 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import { VitePWA } from 'vite-plugin-pwa';
+// import { VitePWA } from 'vite-plugin-pwa'; // <--- DISABLED
 
 export default defineConfig({
   plugins: [
     react(),
-    VitePWA({
-      registerType: 'autoUpdate',
-      workbox: {
-        clientsClaim: true,
-        skipWaiting: true,
-        runtimeCaching: [
-          {
-            urlPattern: /^\/index\.html$/,
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'index-html',
-              expiration: {
-                maxEntries: 1,
-                maxAgeSeconds: 0, // Never cache index.html
-              },
-            },
-          },
-        ],
-      },
-      manifest: {
-        name: 'Playa Photos',
-        short_name: 'PlayaPhotos',
-        theme_color: '#4f46e5',
-        icons: [
-          { src: 'pwa-192x192.png', sizes: '192x192', type: 'image/png' },
-          { src: 'pwa-512x512.png', sizes: '512x512', type: 'image/png' }
-        ]
-      }
-    })
+    // VitePWA({  // <--- DISABLED
+    //   registerType: 'autoUpdate',
+    //   includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
+    //   manifest: {
+    //     name: 'Playa Photos',
+    //     short_name: 'PlayaPhotos',
+    //     description: 'AI-Powered Event Photography',
+    //     theme_color: '#ffffff',
+    //     icons: [
+    //       {
+    //         src: 'pwa-192x192.png',
+    //         sizes: '192x192',
+    //         type: 'image/png'
+    //       },
+    //       {
+    //         src: 'pwa-512x512.png',
+    //         sizes: '512x512',
+    //         type: 'image/png'
+    //       }
+    //     ]
+    //   }
+    // })
   ],
-  // Explicitly set root to current directory
-  root: '.',
-  build: {
-    outDir: 'dist',
-    emptyOutDir: true,
-    rollupOptions: {
-      output: {
-        // Hashing ensures browsers don't use old code
-        entryFileNames: 'assets/[name].[hash].js',
-        chunkFileNames: 'assets/[name].[hash].js',
-        assetFileNames: 'assets/[name].[hash].[ext]',
-      },
+  resolve: {
+    alias: {
+      '@': '/src',
     },
   },
+  build: {
+    outDir: 'dist',
+    sourcemap: true
+  }
 });

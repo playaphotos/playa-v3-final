@@ -3,7 +3,7 @@ import { HashRouter, Routes, Route, Navigate, Link } from 'react-router-dom';
 import { RoutePaths } from './types';
 import { PublicLayout, AppLayout } from './components/Layouts';
 import { CartProvider } from './contexts/CartContext';
-import { InstallPwa } from './components/InstallPwa';
+
 import { Loader2, LayoutDashboard, Image, Settings, BookOpen, LogOut } from 'lucide-react';
 
 // Pages
@@ -51,7 +51,7 @@ const AgencyLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => 
 const App: React.FC = () => {
   return (
     <CartProvider>
-      <InstallPwa />
+      
       <HashRouter>
         <Routes>
           <Route path={RoutePaths.HOME} element={<PublicLayout><Landing /></PublicLayout>} />
