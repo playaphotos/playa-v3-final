@@ -3,7 +3,6 @@ import { HashRouter, Routes, Route, Navigate, Link } from 'react-router-dom';
 import { RoutePaths } from './types';
 import { PublicLayout, AppLayout } from './components/Layouts';
 import { CartProvider } from './contexts/CartContext';
-
 import { Loader2, LayoutDashboard, Image, Settings, BookOpen, LogOut } from 'lucide-react';
 
 // Pages
@@ -20,6 +19,7 @@ import AdminSettings from './pages/admin/Settings';
 import Dashboard from './pages/admin/Dashboard';
 import Features from './pages/Features';
 import Pricing from './pages/Pricing';
+import LiveWall from './pages/LiveWall'; // <--- NEW IMPORT
 
 const EventGallery = React.lazy(() => import('./pages/EventGallery'));
 
@@ -29,7 +29,7 @@ const PageLoader = () => (
   </div>
 );
 
-// INTERNAL AGENCY LAYOUT (Fixes the Vercel Build Error)
+// INTERNAL AGENCY LAYOUT
 const AgencyLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <div className="flex h-screen bg-slate-50">
     <div className="w-64 bg-slate-900 h-full flex flex-col text-white">
@@ -51,9 +51,9 @@ const AgencyLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => 
 const App: React.FC = () => {
   return (
     <CartProvider>
-      
       <HashRouter>
         <Routes>
+          {/* Public & Marketing */}
           <Route path={RoutePaths.HOME} element={<PublicLayout><Landing /></PublicLayout>} />
           <Route path={RoutePaths.AGENCY_LANDING} element={<PublicLayout><AgencyLanding /></PublicLayout>} />
           <Route path={RoutePaths.LOGIN} element={<PublicLayout><Login /></PublicLayout>} />
@@ -61,14 +61,23 @@ const App: React.FC = () => {
           <Route path={RoutePaths.PRIVACY} element={<PublicLayout><Privacy /></PublicLayout>} />
           <Route path={RoutePaths.PRICING} element={<PublicLayout><Pricing /></PublicLayout>} />
           <Route path={RoutePaths.FEATURES} element={<PublicLayout><Features /></PublicLayout>} />
+          
+          {/* App Functionality */}
           <Route path={RoutePaths.APP_GALLERY} element={<AppLayout><Suspense fallback={<PageLoader />}><EventGallery /></Suspense></AppLayout>} />
           <Route path={RoutePaths.EVENT_SLUG} element={<AppLayout><Suspense fallback={<PageLoader />}><EventGallery /></Suspense></AppLayout>} />
           <Route path={RoutePaths.CHECKOUT_SUCCESS} element={<PublicLayout><Success /></PublicLayout>} />
+
+          {/* NEW: LIVE WALL (Kiosk Mode - No Layout) */}
+          <Route path="/live/:eventId" element={<LiveWall />} />
+          <Route path="/live/demo" element={<LiveWall />} />
+
+          {/* Admin */}
           <Route path={RoutePaths.ADMIN_DASHBOARD} element={<AgencyLayout><Dashboard /></AgencyLayout>} />
           <Route path={RoutePaths.ADMIN_EVENTS} element={<AgencyLayout><EventsManager /></AgencyLayout>} />
           <Route path={RoutePaths.ADMIN_EVENT_DETAIL} element={<AgencyLayout><EventUploadManager /></AgencyLayout>} />
           <Route path="/admin/documentation" element={<AgencyLayout><Documentation /></AgencyLayout>} />
           <Route path="/admin/settings" element={<AgencyLayout><AdminSettings /></AgencyLayout>} />
+          
           <Route path="/selfie" element={<Navigate to="/" replace />} />
           <Route path="*" element={<Navigate to={RoutePaths.HOME} replace />} />
         </Routes>
