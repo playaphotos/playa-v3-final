@@ -1,33 +1,53 @@
 import React from 'react';
-import { CheckCircle, Download, Mail } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { CheckCircle, Download, ArrowRight, Home, Sparkles } from 'lucide-react';
 
-const Success = () => {
+const Success: React.FC = () => {
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
-       <div className="bg-white p-8 md:p-12 rounded-2xl shadow-xl max-w-lg w-full text-center">
-          <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
-             <CheckCircle className="w-10 h-10" />
-          </div>
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">Order Complete!</h1>
-          <p className="text-slate-500 mb-8">Your payment was successful. You can download your photos below.</p>
-          
-          <div className="space-y-4 mb-8">
-             <button className="w-full bg-brand-600 text-white py-4 rounded-xl font-bold hover:bg-brand-700 shadow-lg flex items-center justify-center gap-2">
-                <Download className="w-5 h-5" /> Download All Photos (ZIP)
-             </button>
-             <div className="p-4 bg-blue-50 text-blue-800 rounded-xl text-sm flex items-start gap-3 text-left">
-                <Mail className="w-5 h-5 flex-shrink-0 mt-0.5" />
-                <p>We've also sent a backup download link and your receipt to your email address.</p>
-             </div>
-          </div>
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6 font-sans">
+      <motion.div 
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        className="bg-white max-w-lg w-full rounded-3xl shadow-2xl overflow-hidden text-center relative"
+      >
+        {/* Confetti / Success Header */}
+        <div className="bg-green-500 p-10 relative overflow-hidden">
+           <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
+           <motion.div 
+             initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', delay: 0.2 }}
+             className="w-24 h-24 bg-white rounded-full mx-auto flex items-center justify-center text-green-500 shadow-xl relative z-10"
+           >
+              <CheckCircle size={48} strokeWidth={3} />
+           </motion.div>
+        </div>
 
-          <Link to="/" className="text-slate-400 hover:text-slate-600 text-sm">
-             Return to Home
-          </Link>
-       </div>
+        <div className="p-10">
+           <h1 className="text-3xl font-extrabold text-slate-900 mb-2">Payment Successful!</h1>
+           <p className="text-slate-500 mb-8 text-lg">Your memories are ready. A receipt has been sent to your email.</p>
+           
+           <div className="bg-slate-50 rounded-2xl p-6 mb-8 border border-slate-100">
+              <h3 className="font-bold text-slate-900 mb-4 flex items-center justify-center gap-2">
+                 <Sparkles size={18} className="text-indigo-500"/> Your Order Includes:
+              </h3>
+              <ul className="text-left space-y-3 text-slate-600">
+                 <li className="flex items-center gap-3"><CheckCircle size={16} className="text-green-500"/> 12 High-Res Photos</li>
+                 <li className="flex items-center gap-3"><CheckCircle size={16} className="text-green-500"/> Full Commercial License</li>
+                 <li className="flex items-center gap-3"><CheckCircle size={16} className="text-green-500"/> AI Remix (Cyberpunk Pack)</li>
+              </ul>
+           </div>
+
+           <div className="space-y-3">
+              <button className="w-full py-4 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-500 shadow-lg shadow-indigo-500/30 flex items-center justify-center gap-2 transition-all transform hover:-translate-y-1">
+                 <Download size={20}/> Download All Photos (ZIP)
+              </button>
+              <Link to="/" className="w-full py-4 bg-white border-2 border-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-50 flex items-center justify-center gap-2">
+                 <Home size={20}/> Return Home
+              </Link>
+           </div>
+        </div>
+      </motion.div>
     </div>
   );
 };
-
 export default Success;
