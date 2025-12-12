@@ -5,7 +5,7 @@ import { PublicLayout, AppLayout } from './components/Layouts';
 import { CartProvider } from './contexts/CartContext';
 import { Loader2, LayoutDashboard, Image, Settings, BookOpen, LogOut } from 'lucide-react';
 
-// Pages
+// Eager Imports (Critical Paths)
 import Landing from './pages/Landing';
 import AgencyLanding from './pages/AgencyLanding';
 import Login from './pages/Login';
@@ -13,17 +13,18 @@ import ForgotPassword from './pages/ForgotPassword';
 import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
 import Success from './pages/Success';
-import EventsManager from './pages/admin/EventsManager';
-import EventUploadManager from './pages/admin/EventUploadManager';
-import Documentation from './pages/admin/Documentation';
-import AdminSettings from './pages/admin/Settings';
-import Dashboard from './pages/admin/Dashboard';
 import Features from './pages/Features';
 import Pricing from './pages/Pricing';
 import LiveWall from './pages/LiveWall';
-import Upload from './pages/Upload'; // <--- NEW IMPORT
+import Upload from './pages/Upload'; // <--- STANDARD IMPORT (Fixes White Screen)
 
+// Lazy Imports (Admin Stuff)
 const EventGallery = React.lazy(() => import('./pages/EventGallery'));
+const Dashboard = React.lazy(() => import('./pages/admin/Dashboard'));
+const EventsManager = React.lazy(() => import('./pages/admin/EventsManager'));
+const EventUploadManager = React.lazy(() => import('./pages/admin/EventUploadManager'));
+const Documentation = React.lazy(() => import('./pages/admin/Documentation'));
+const AdminSettings = React.lazy(() => import('./pages/admin/Settings'));
 
 const PageLoader = () => (
   <div className="h-screen flex items-center justify-center bg-slate-50">
@@ -55,41 +56,33 @@ const App: React.FC = () => {
     <CartProvider>
       <HashRouter>
         <Routes>
-          {/* Public Marketing Pages */}
           <Route path={RoutePaths.HOME} element={<PublicLayout><Landing /></PublicLayout>} />
           <Route path={RoutePaths.AGENCY_LANDING} element={<PublicLayout><AgencyLanding /></PublicLayout>} />
-          
-          {/* Auth Routes */}
           <Route path={RoutePaths.LOGIN} element={<PublicLayout><Login /></PublicLayout>} />
           <Route path="/forgot-password" element={<PublicLayout><ForgotPassword /></PublicLayout>} />
-
-          {/* Legal & Info */}
           <Route path={RoutePaths.TERMS} element={<PublicLayout><Terms /></PublicLayout>} />
           <Route path={RoutePaths.PRIVACY} element={<PublicLayout><Privacy /></PublicLayout>} />
           <Route path={RoutePaths.PRICING} element={<PublicLayout><Pricing /></PublicLayout>} />
           <Route path={RoutePaths.FEATURES} element={<PublicLayout><Features /></PublicLayout>} />
           
-          {/* --- LIVE EVENT ROUTES --- */}
+          {/* Live & Upload Routes */}
           <Route path="/live/:eventId" element={<LiveWall />} />
           <Route path="/live/demo" element={<LiveWall />} />
-          <Route path="/upload/:eventId" element={<Upload />} />  {/* <--- NEW ROUTE */}
+          <Route path="/upload/:eventId" element={<Upload />} /> {/* <--- DIRECT RENDER */}
 
           {/* App Functionality */}
           <Route path={RoutePaths.APP_GALLERY} element={<AppLayout><Suspense fallback={<PageLoader />}><EventGallery /></Suspense></AppLayout>} />
           <Route path={RoutePaths.EVENT_SLUG} element={<AppLayout><Suspense fallback={<PageLoader />}><EventGallery /></Suspense></AppLayout>} />
-          
-          {/* Checkout & Success */}
           <Route path="/success" element={<PublicLayout><Success /></PublicLayout>} />
           <Route path={RoutePaths.CHECKOUT_SUCCESS} element={<PublicLayout><Success /></PublicLayout>} />
 
-          {/* Admin / Agency Routes */}
-          <Route path={RoutePaths.ADMIN_DASHBOARD} element={<AgencyLayout><Dashboard /></AgencyLayout>} />
-          <Route path={RoutePaths.ADMIN_EVENTS} element={<AgencyLayout><EventsManager /></AgencyLayout>} />
-          <Route path={RoutePaths.ADMIN_EVENT_DETAIL} element={<AgencyLayout><EventUploadManager /></AgencyLayout>} />
-          <Route path="/admin/documentation" element={<AgencyLayout><Documentation /></AgencyLayout>} />
-          <Route path="/admin/settings" element={<AgencyLayout><AdminSettings /></AgencyLayout>} />
+          {/* Admin Routes */}
+          <Route path={RoutePaths.ADMIN_DASHBOARD} element={<Suspense fallback={<PageLoader />}><AgencyLayout><Dashboard /></AgencyLayout></Suspense>} />
+          <Route path={RoutePaths.ADMIN_EVENTS} element={<Suspense fallback={<PageLoader />}><AgencyLayout><EventsManager /></AgencyLayout></Suspense>} />
+          <Route path={RoutePaths.ADMIN_EVENT_DETAIL} element={<Suspense fallback={<PageLoader />}><AgencyLayout><EventUploadManager /></AgencyLayout></Suspense>} />
+          <Route path="/admin/documentation" element={<Suspense fallback={<PageLoader />}><AgencyLayout><Documentation /></AgencyLayout></Suspense>} />
+          <Route path="/admin/settings" element={<Suspense fallback={<PageLoader />}><AgencyLayout><AdminSettings /></AgencyLayout></Suspense>} />
           
-          {/* Catch-All (Redirects to Home) */}
           <Route path="/selfie" element={<Navigate to="/" replace />} />
           <Route path="*" element={<Navigate to={RoutePaths.HOME} replace />} />
         </Routes>

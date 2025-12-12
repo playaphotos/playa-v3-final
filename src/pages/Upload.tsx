@@ -1,24 +1,13 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useParams } from 'react-router-dom';
 
 const Upload = () => {
   const { eventId } = useParams();
-  const [status, setStatus] = useState('Waiting...');
-
   return (
-    <div className="min-h-screen bg-black text-white p-10 text-center">
-      <h1 className="text-4xl font-bold text-green-500 mb-4">It Works!</h1>
-      <p className="text-xl mb-4">You are uploading to event: {eventId}</p>
-      
-      <div className="p-4 border border-white rounded mt-4">
-         <p>Status: {status}</p>
-         <button 
-           onClick={() => setStatus('Button Clicked!')}
-           className="bg-blue-600 text-white px-6 py-3 rounded mt-4"
-         >
-           Test Button
-         </button>
-      </div>
+    <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center p-6 text-center">
+      <h1 className="text-4xl font-bold text-green-500 mb-4">Upload Ready</h1>
+      <p className="text-xl">You are connected to: <span className="text-indigo-400 font-bold">{eventId}</span></p>
+      <button className="mt-8 bg-indigo-600 px-8 py-4 rounded-xl font-bold">Take Photo</button>
     </div>
   );
 };
