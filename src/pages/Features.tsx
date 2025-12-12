@@ -6,7 +6,7 @@ const Features = () => {
   const [showDemo, setShowDemo] = useState(false);
 
   return (
-    <div className="bg-white">
+    <div className="bg-white font-sans">
       {/* HEADER */}
       <div className="relative bg-slate-900 py-24 lg:py-32 overflow-hidden text-center px-6">
          <div className="absolute top-0 left-0 w-full h-full opacity-20 pointer-events-none">
@@ -47,11 +47,10 @@ const Features = () => {
         </div>
       </div>
 
-      {/* THE MODAL */}
+      {/* THE MODAL (No imageUrl prop = triggers Upload Mode) */}
       <RemixModal 
         isOpen={showDemo} 
         onClose={() => setShowDemo(false)} 
-        imageUrl="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=800"
       />
     </div>
   );
