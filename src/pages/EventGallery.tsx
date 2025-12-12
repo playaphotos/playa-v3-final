@@ -1,124 +1,161 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useParams } from 'react-router-dom';
-import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
+import React, { useState, useEffect } from 'react';
+import { useParams, Link } from 'react-router-dom';
+import Masonry from 'react-masonry-css';
+import { motion } from 'framer-motion';
+import { Search, Download, ShoppingCart, Heart, Share2, ArrowLeft, Camera, Lock } from 'lucide-react';
+import { collection, query, where, getDocs, orderBy } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { useCart } from '../contexts/CartContext';
-import { CartDrawer } from '../components/CartDrawer';
-import { Camera, Search, ShoppingBag, Download, Image as ImageIcon, X, Loader2, AlertCircle } from 'lucide-react';
 
-type FaceApiLib = any;
-
-const EventGallery = () => {
-  const { agencySlug, eventSlug, eventId: paramEventId } = useParams();
-  const [event, setEvent] = useState<any>(null);
+const EventGallery: React.FC = () => {
+  const { eventId } = useParams();
+  const { addToCart } = useCart();
   const [photos, setPhotos] = useState<any[]>([]);
-  const [filteredPhotos, setFilteredPhotos] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [faceApi, setFaceApi] = useState<FaceApiLib | null>(null);
-  const [faceApiLoaded, setFaceApiLoaded] = useState(false);
-  const [isSearching, setIsSearching] = useState(false);
-  const [searchStatus, setSearchStatus] = useState<'idle' | 'camera' | 'processing'>('idle');
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [searchError, setSearchError] = useState<string | null>(null);
-  const { addToCart, toggleCart, itemCount } = useCart();
+  const [eventName, setEventName] = useState('Event Gallery');
+
+  // MOCK DATA for "DEMO" code
+  const demoPhotos = [
+    { id: 'd1', url: 'https://images.unsplash.com/photo-1519671482538-518b5c2c681c?auto=format&fit=crop&q=80&w=800', price: 5 },
+    { id: 'd2', url: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&q=80&w=800', price: 5 },
+    { id: 'd3', url: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&q=80&w=800', price: 5 },
+    { id: 'd4', url: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&q=80&w=800', price: 5 },
+    { id: 'd5', url: 'https://images.unsplash.com/photo-1527529482837-4698179dc6ce?auto=format&fit=crop&q=80&w=800', price: 5 },
+    { id: 'd6', url: 'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?auto=format&fit=crop&q=80&w=800', price: 5 },
+    { id: 'd7', url: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=80&w=800', price: 5 },
+    { id: 'd8', url: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&q=80&w=800', price: 5 },
+  ];
 
   useEffect(() => {
-    const fetchEvent = async () => {
+    const fetchPhotos = async () => {
       setLoading(true);
+      
+      // SCENARIO 1: DEMO MODE
+      if (eventId?.toLowerCase() === 'demo') {
+        setTimeout(() => {
+          setPhotos(demoPhotos);
+          setEventName('Summer Gala 2025 (Demo)');
+          setLoading(false);
+        }, 800); // Fake loading delay
+        return;
+      }
+
+      // SCENARIO 2: REAL FIREBASE DATA
       try {
-        let eventId = paramEventId;
-        if (!eventId) return;
+        // 1. Get Event Details
+        // (In a real app we would fetch the event doc to get the name)
+        setEventName(`Event #${eventId}`);
 
-        const eventDoc = await getDoc(doc(db, 'events', eventId));
-        if (eventDoc.exists()) {
-          const data = eventDoc.data();
-          setEvent({
-            id: eventDoc.id,
-            name: data.name,
-            agencyId: data.agencyId,
-            date: data.date,
-            pricing: data.pricing || { socialPrice: 0.99, printPrice: 9.99, originalPrice: 19.99, creditPrice: 1.00 }
-          });
-
-          const photoQ = query(collection(db, 'photos'), where('eventId', '==', eventId));
-          const photoSnap = await getDocs(photoQ);
-          const photoList = photoSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-          setPhotos(photoList);
-          setFilteredPhotos(photoList);
-        }
+        // 2. Get Photos
+        const q = query(
+            collection(db, 'photos'), 
+            where('eventId', '==', eventId),
+            orderBy('createdAt', 'desc')
+        );
+        const snapshot = await getDocs(q);
+        const realPhotos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setPhotos(realPhotos);
       } catch (err) {
-        console.error(err);
+        console.error("Error loading gallery:", err);
       } finally {
         setLoading(false);
       }
     };
-    fetchEvent();
-  }, [paramEventId]);
 
-  useEffect(() => {
-    const loadModels = async () => {
-      try {
-        console.log("Dynamically importing face-api.js...");
-        const loadedFaceApi = await import('face-api.js');
-        setFaceApi(loadedFaceApi);
-        const MODEL_URL = '/models';
-        console.log("Loading FaceAPI weights from", MODEL_URL);
-        await Promise.all([
-          loadedFaceApi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL),
-          loadedFaceApi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
-          loadedFaceApi.nets.faceRecognitionNet.loadFromUri(MODEL_URL),
-        ]);
-        setFaceApiLoaded(true);
-      } catch (e) {
-        console.warn("Face API models failed to load.", e);
-      }
-    };
-    loadModels();
-  }, []);
+    fetchPhotos();
+  }, [eventId]);
 
-  if (loading) return <div className="h-screen flex items-center justify-center"><Loader2 className="animate-spin w-10 h-10 text-brand-600" /></div>;
-  if (!event) return <div className="h-screen flex items-center justify-center">Event Not Found</div>;
+  const breakpointColumnsObj = {
+    default: 4,
+    1100: 3,
+    700: 2,
+    500: 1
+  };
 
   return (
-    <div className="min-h-screen bg-slate-50 pb-20">
-      <CartDrawer />
-      <div className="bg-white border-b border-slate-200 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold text-slate-900">{event.name}</h1>
-            <p className="text-sm text-slate-500">{event.date}</p>
+    <div className="min-h-screen bg-slate-50 font-sans pb-20">
+      
+      {/* HEADER */}
+      <div className="bg-white border-b border-slate-200 sticky top-16 z-30 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+             <Link to="/" className="p-2 hover:bg-slate-100 rounded-full text-slate-500">
+                <ArrowLeft size={20} />
+             </Link>
+             <div>
+                <h1 className="text-lg font-bold text-slate-900 leading-none">{eventName}</h1>
+                <p className="text-xs text-slate-500">{photos.length} photos</p>
+             </div>
           </div>
-          <div className="flex gap-3">
-             <button onClick={toggleCart} className="relative p-2 text-slate-700 hover:bg-slate-100 rounded-full">
-               <ShoppingBag />
-               {itemCount > 0 && <span className="absolute top-0 right-0 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">{itemCount}</span>}
+          
+          <div className="flex items-center gap-2">
+             <button className="hidden md:flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-700 font-bold rounded-lg hover:bg-slate-200 text-sm">
+                <Search size={16}/> Find Me
+             </button>
+             <button className="px-4 py-2 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-500 text-sm shadow-lg shadow-indigo-500/20 flex items-center gap-2">
+                <Lock size={16}/> Unlock All
              </button>
           </div>
         </div>
       </div>
-      
-      {/* Photo Grid */}
+
+      {/* GALLERY GRID */}
       <div className="max-w-7xl mx-auto px-4 py-6">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {filteredPhotos.map((photo: any) => (
-            <div key={photo.id} className="relative group bg-slate-200 rounded-lg overflow-hidden aspect-[2/3] shadow-sm hover:shadow-md transition-shadow">
-               <img src={photo.watermarkedUrl || photo.originalUrl} className="w-full h-full object-cover" loading="lazy" />
-               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
-                  <button onClick={() => addToCart({
-                      photoId: photo.id,
-                      thumbnailUrl: photo.watermarkedUrl || photo.originalUrl,
-                      type: 'social',
-                      price: event.pricing.socialPrice,
-                      label: 'Social Download'
-                  })} className="w-full bg-white/10 backdrop-blur text-white text-sm py-2 rounded-lg hover:bg-white/20 flex items-center justify-center gap-2 border border-white/10">
-                     <Download size={14} /> Add to Cart (${event.pricing.socialPrice})
-                  </button>
-               </div>
-            </div>
-          ))}
-        </div>
+        {loading ? (
+           <div className="text-center py-20">
+              <div className="w-10 h-10 border-4 border-slate-200 border-t-indigo-600 rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="text-slate-400">Loading gallery...</p>
+           </div>
+        ) : photos.length === 0 ? (
+           <div className="text-center py-20 bg-white rounded-2xl border border-dashed border-slate-300">
+              <Camera className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+              <h3 className="text-xl font-bold text-slate-700">No Photos Yet</h3>
+              <p className="text-slate-500">Photos will appear here as they are uploaded.</p>
+           </div>
+        ) : (
+          <Masonry
+            breakpointCols={breakpointColumnsObj}
+            className="flex -ml-6 w-auto"
+            columnClassName="pl-6 bg-clip-padding"
+          >
+            {photos.map((photo) => (
+              <motion.div 
+                key={photo.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mb-6 group relative bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden"
+              >
+                <div className="relative overflow-hidden cursor-pointer">
+                   <img src={photo.url} alt="Event" className="w-full h-auto transform group-hover:scale-105 transition-transform duration-500" />
+                   
+                   {/* OVERLAY ACTIONS */}
+                   <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+                      <button className="p-3 bg-white text-slate-900 rounded-full hover:bg-slate-100 transition-colors shadow-lg">
+                         <Heart size={20} />
+                      </button>
+                      <button className="p-3 bg-white text-slate-900 rounded-full hover:bg-slate-100 transition-colors shadow-lg">
+                         <Share2 size={20} />
+                      </button>
+                   </div>
+                </div>
+
+                <div className="p-3 flex justify-between items-center">
+                   <span className="text-slate-900 font-bold text-sm">${photo.price || 5}.00</span>
+                   <button 
+                     onClick={() => addToCart(photo)}
+                     className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                   >
+                      <ShoppingCart size={18} />
+                   </button>
+                </div>
+              </motion.div>
+            ))}
+          </Masonry>
+        )}
       </div>
+
     </div>
   );
 };
+
 export default EventGallery;
