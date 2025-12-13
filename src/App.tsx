@@ -5,7 +5,7 @@ import { PublicLayout, AppLayout } from './components/Layouts';
 import { CartProvider } from './contexts/CartContext';
 import { LayoutDashboard, Image, Settings, BookOpen, LogOut } from 'lucide-react';
 
-// STANDARD IMPORTS (Prevents White Screen Crash)
+// --- PUBLIC PAGES ---
 import Landing from './pages/Landing';
 import AgencyLanding from './pages/AgencyLanding';
 import Login from './pages/Login';
@@ -16,19 +16,21 @@ import Success from './pages/Success';
 import Features from './pages/Features';
 import Pricing from './pages/Pricing';
 
-// THE CORE APP COMPONENTS
-import EventWall from './pages/EventWall';       // The Desktop Wall (Sidebar Version)
-import MobileUpload from './pages/MobileUpload'; // The Mobile Upload (No Error Version)
-import EventGallery from './pages/EventGallery'; // The Guest Gallery
+// --- CORE APP PAGES ---
+import EventWall from './pages/EventWall';       
+import MobileUpload from './pages/MobileUpload'; 
 
-// ADMIN PAGES
+// --- SUSPECT FILE (Commented out to stop crash) ---
+// import EventGallery from './pages/EventGallery'; 
+
+// --- ADMIN PAGES ---
 import Dashboard from './pages/admin/Dashboard';
 import EventsManager from './pages/admin/EventsManager';
 import EventUploadManager from './pages/admin/EventUploadManager';
 import Documentation from './pages/admin/Documentation';
 import AdminSettings from './pages/admin/Settings';
 
-// AGENCY LAYOUT WRAPPER
+// INTERNAL AGENCY LAYOUT
 const AgencyLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <div className="flex h-screen bg-slate-50">
     <div className="w-64 bg-slate-900 h-full flex flex-col text-white">
@@ -50,14 +52,14 @@ const AgencyLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => 
 const App: React.FC = () => {
   return (
     <CartProvider>
-      {/* VERSION BANNER: CONFIRMS UPDATE IS LIVE */}
-      <div className="fixed top-0 left-0 right-0 z-[9999] bg-green-600 text-white text-[10px] font-bold text-center pointer-events-none opacity-70">
-        SYSTEM V4.1 - ROUTE UPDATE ACTIVE
+      {/* VERSION BANNER: PROVES NEW CODE IS RUNNING */}
+      <div className="fixed top-0 left-0 right-0 z-[9999] bg-purple-600 text-white text-[10px] font-bold text-center pointer-events-none opacity-80">
+        SYSTEM V4.2 - CRASH DIAGNOSTIC MODE
       </div>
       
       <HashRouter>
         <Routes>
-          {/* MARKETING ROUTES */}
+          {/* MARKETING */}
           <Route path={RoutePaths.HOME} element={<PublicLayout><Landing /></PublicLayout>} />
           <Route path={RoutePaths.AGENCY_LANDING} element={<PublicLayout><AgencyLanding /></PublicLayout>} />
           <Route path={RoutePaths.LOGIN} element={<PublicLayout><Login /></PublicLayout>} />
@@ -67,21 +69,19 @@ const App: React.FC = () => {
           <Route path={RoutePaths.PRICING} element={<PublicLayout><Pricing /></PublicLayout>} />
           <Route path={RoutePaths.FEATURES} element={<PublicLayout><Features /></PublicLayout>} />
           
-          {/* --- CORE EVENT ROUTES (UPDATED) --- */}
-          {/* Changed from /live to /view to force browser to load new code */}
+          {/* CORE EVENT APPS (Using /view/ to break cache) */}
           <Route path="/view/:eventId" element={<EventWall />} />
           <Route path="/view/demo" element={<EventWall />} />
-          
-          {/* UPLOAD ROUTE */}
           <Route path="/upload/:eventId" element={<MobileUpload />} />
 
-          {/* GALLERY & SUCCESS */}
-          <Route path={RoutePaths.APP_GALLERY} element={<AppLayout><EventGallery /></AppLayout>} />
-          <Route path={RoutePaths.EVENT_SLUG} element={<AppLayout><EventGallery /></AppLayout>} />
+          {/* GALLERY (Disabled to test crash) */}
+          {/* <Route path={RoutePaths.APP_GALLERY} element={<AppLayout><EventGallery /></AppLayout>} /> */}
+          {/* <Route path={RoutePaths.EVENT_SLUG} element={<AppLayout><EventGallery /></AppLayout>} /> */}
+          
           <Route path="/success" element={<PublicLayout><Success /></PublicLayout>} />
           <Route path={RoutePaths.CHECKOUT_SUCCESS} element={<PublicLayout><Success /></PublicLayout>} />
 
-          {/* ADMIN ROUTES */}
+          {/* ADMIN SUITE */}
           <Route path={RoutePaths.ADMIN_DASHBOARD} element={<AgencyLayout><Dashboard /></AgencyLayout>} />
           <Route path={RoutePaths.ADMIN_EVENTS} element={<AgencyLayout><EventsManager /></AgencyLayout>} />
           <Route path={RoutePaths.ADMIN_EVENT_DETAIL} element={<AgencyLayout><EventUploadManager /></AgencyLayout>} />
