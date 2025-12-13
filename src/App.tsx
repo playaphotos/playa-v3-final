@@ -5,7 +5,7 @@ import { PublicLayout, AppLayout } from './components/Layouts';
 import { CartProvider } from './contexts/CartContext';
 import { LayoutDashboard, Image, Settings, BookOpen, LogOut } from 'lucide-react';
 
-// --- PUBLIC PAGES ---
+// --- PUBLIC ---
 import Landing from './pages/Landing';
 import AgencyLanding from './pages/AgencyLanding';
 import Login from './pages/Login';
@@ -16,30 +16,31 @@ import Success from './pages/Success';
 import Features from './pages/Features';
 import Pricing from './pages/Pricing';
 
-// --- CORE APP PAGES ---
+// --- CORE ---
 import EventWall from './pages/EventWall';       
-import MobileUpload from './pages/MobileUpload'; 
 
-// --- ADMIN PAGES ---
+// --- THE NEW COMPONENT (Swapped from MobileUpload) ---
+import MobileSnap from './pages/MobileSnap'; 
+
+// --- GALLERY (Keep commented until mobile is fixed) ---
+// import EventGallery from './pages/EventGallery'; 
+
+// --- ADMIN ---
 import Dashboard from './pages/admin/Dashboard';
 import EventsManager from './pages/admin/EventsManager';
 import EventUploadManager from './pages/admin/EventUploadManager';
 import Documentation from './pages/admin/Documentation';
 import AdminSettings from './pages/admin/Settings';
 
-// CURRENT VERSION - CHANGE THIS TO FORCE UPDATES
-const APP_VERSION = '4.5';
+const APP_VERSION = '4.6'; // Bumped version
 
 const VersionEnforcer = () => {
   useEffect(() => {
     const storedVersion = localStorage.getItem('app_version');
     if (storedVersion !== APP_VERSION) {
       console.log(`New version detected: ${APP_VERSION}. Clearing cache...`);
-      // 1. Clear Local Storage
       localStorage.clear();
-      // 2. Set new version
       localStorage.setItem('app_version', APP_VERSION);
-      // 3. Force Hard Reload from Server (Bypasses Cache)
       window.location.reload();
     }
   }, []);
@@ -68,14 +69,12 @@ const App: React.FC = () => {
   return (
     <CartProvider>
       <VersionEnforcer />
-      
-      <div className="fixed top-0 left-0 right-0 z-[9999] bg-red-600 text-white text-[10px] font-bold text-center pointer-events-none opacity-80">
-        SYSTEM V{APP_VERSION} - CACHE ENFORCER ACTIVE
+      <div className="fixed top-0 left-0 right-0 z-[9999] bg-emerald-600 text-white text-[10px] font-bold text-center pointer-events-none opacity-80">
+        SYSTEM V{APP_VERSION} - NEW FILE SYSTEM
       </div>
       
       <HashRouter>
         <Routes>
-          {/* MARKETING */}
           <Route path={RoutePaths.HOME} element={<PublicLayout><Landing /></PublicLayout>} />
           <Route path={RoutePaths.AGENCY_LANDING} element={<PublicLayout><AgencyLanding /></PublicLayout>} />
           <Route path={RoutePaths.LOGIN} element={<PublicLayout><Login /></PublicLayout>} />
@@ -85,10 +84,11 @@ const App: React.FC = () => {
           <Route path={RoutePaths.PRICING} element={<PublicLayout><Pricing /></PublicLayout>} />
           <Route path={RoutePaths.FEATURES} element={<PublicLayout><Features /></PublicLayout>} />
           
-          {/* CORE ROUTES - Changed to /snap/ to be absolutely unique */}
           <Route path="/view/:eventId" element={<EventWall />} />
           <Route path="/view/demo" element={<EventWall />} />
-          <Route path="/snap/:eventId" element={<MobileUpload />} />
+          
+          {/* THE NEW COMPONENT */}
+          <Route path="/snap/:eventId" element={<MobileSnap />} />
 
           {/* ADMIN */}
           <Route path={RoutePaths.ADMIN_DASHBOARD} element={<AgencyLayout><Dashboard /></AgencyLayout>} />
