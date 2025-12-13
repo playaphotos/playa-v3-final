@@ -4,13 +4,13 @@ import Masonry from 'react-masonry-css';
 import { QRCodeSVG } from 'qrcode.react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Camera, Sparkles, Wifi } from 'lucide-react';
-import { collection, query, where, onSnapshot, orderBy, limit } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, limit } from 'firebase/firestore'; // Removed orderBy import
 import { db } from '../lib/firebase';
 
 const EventWall: React.FC = () => {
   const { eventId } = useParams();
   
-  // Stock photos for Demo Mode simulation (Now disabled)
+  // Stock photos for Initial State
   const demoPhotos = [
     'https://images.unsplash.com/photo-1519671482538-518b5c2c681c?auto=format&fit=crop&q=80&w=800',
     'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&q=80&w=800',
@@ -27,49 +27,41 @@ const EventWall: React.FC = () => {
   );
 
   // --- TROJAN HORSE LINK ---
-  // We point explicitly to 'mobile.html' instead of the root.
-  // Since the phone has never cached 'mobile.html', it MUST fetch fresh code.
   const baseUrl = window.location.origin;
   const safeId = eventId || 'demo';
   const uploadUrl = `${baseUrl}/mobile.html#/magic/${safeId}`;
 
-  // 1. REAL DATA CONNECTION (FIXED: NOW WORKS FOR DEMO TOO)
+  // 1. REAL DATA CONNECTION (CLIENT-SIDE SORT)
   useEffect(() => {
-    // FIX: We allow this to run even if the ID is 'demo'
     const currentEventId = eventId || 'demo';
+    console.log("Listening for photos in:", currentEventId);
 
+    // SIMPLIFIED QUERY: Removed 'orderBy' to prevent "Missing Index" errors
     const q = query(
       collection(db, 'photos'), 
       where('eventId', '==', currentEventId), 
-      orderBy('createdAt', 'desc'), 
       limit(50)
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const newPhotos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      // Only update if we actually found photos, otherwise keep the initial stock ones for a moment
-      if (newPhotos.length > 0) {
-        setPhotos(newPhotos);
+      const rawPhotos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      
+      console.log("Found photos:", rawPhotos.length);
+
+      if (rawPhotos.length > 0) {
+        // MANUALLY SORT BY TIME (Newest First)
+        // We do this here instead of in Firestore to avoid Index errors
+        const sortedPhotos = rawPhotos.sort((a: any, b: any) => {
+           const timeA = a.createdAt?.seconds || 0;
+           const timeB = b.createdAt?.seconds || 0;
+           return timeB - timeA;
+        });
+        
+        setPhotos(sortedPhotos);
       }
     });
     return () => unsubscribe();
   }, [eventId]);
-
-  // 2. DEMO MODE SIMULATION (DISABLED)
-  // We commented this out so it doesn't overwrite your real photo with fake ones.
-  /*
-  useEffect(() => {
-    if (eventId && eventId !== 'demo') return;
-    const interval = setInterval(() => {
-      setPhotos(prev => {
-        const randomPhoto = demoPhotos[Math.floor(Math.random() * demoPhotos.length)];
-        const nextPhoto = { id: `new-${Date.now()}`, url: randomPhoto };
-        return [nextPhoto, ...prev].slice(0, 15);
-      });
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [eventId]);
-  */
 
   return (
     <div className="h-screen bg-black text-white overflow-hidden flex font-sans">
@@ -87,6 +79,7 @@ const EventWall: React.FC = () => {
          </div>
          
          <div className="flex-1 overflow-y-auto p-6 pt-28 no-scrollbar">
+            {/* Masonry Grid */}
             <Masonry breakpointCols={{default: 3, 1600: 3, 1200: 2, 700: 2, 500: 1}} className="flex -ml-6 w-auto" columnClassName="pl-6 bg-clip-padding">
                <AnimatePresence mode='popLayout'>
                   {photos.map((photo, i) => (
@@ -120,7 +113,7 @@ const EventWall: React.FC = () => {
                 <QRCodeSVG value={uploadUrl} size={200} />
              </div>
              
-             {/* DEBUG: Visual URL check */}
+             {/* DEBUG URL */}
              <div className="w-full mb-6 bg-slate-800 p-2 rounded text-[10px] text-slate-400 font-mono break-all border border-slate-700">
                 {uploadUrl}
              </div>
