@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import { resolve } from 'path';
 // import { VitePWA } from 'vite-plugin-pwa'; // <--- DISABLED
 
 export default defineConfig({
@@ -30,11 +31,18 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      '@': '/src',
+      '@': resolve(__dirname, 'src'),
     },
   },
   build: {
     outDir: 'dist',
-    sourcemap: true
+    sourcemap: true,
+    // THE TROJAN HORSE FIX:
+    rollupOptions: {
+      input: {
+        main: resolve(__dirname, 'index.html'),
+        mobile: resolve(__dirname, 'mobile.html'), // Forces a fresh file for phones
+      },
+    },
   }
 });
