@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Save, Key, CreditCard, Globe, Lock, ShieldCheck, CheckCircle, Info, RefreshCw, AlertCircle, Copy } from 'lucide-react';
+import { Save, Key, CreditCard, Globe, Lock, ShieldCheck, CheckCircle, RefreshCw, AlertCircle, Copy } from 'lucide-react';
 
 const AdminSettings: React.FC = () => {
   const [activeTab, setActiveTab] = useState('payments');
