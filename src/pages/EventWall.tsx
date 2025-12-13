@@ -10,7 +10,6 @@ import { db } from '../lib/firebase';
 const EventWall: React.FC = () => {
   const { eventId } = useParams();
   
-  // Stock photos for Demo Mode
   const demoPhotos = [
     'https://images.unsplash.com/photo-1519671482538-518b5c2c681c?auto=format&fit=crop&q=80&w=800',
     'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&q=80&w=800',
@@ -26,12 +25,12 @@ const EventWall: React.FC = () => {
     demoPhotos.map((url, i) => ({ id: `init-${i}`, url }))
   );
 
-  // CACHE BUSTER: Points to the new /snap/ route.
-  // The 't=' timestamp forces the phone to treat this as a unique URL every time.
-  const uploadUrl = `${window.location.origin}/#/snap/${eventId || 'demo'}?t=${Date.now()}`;
+  // CACHE BUSTER: MAGIC ROUTE
+  // Forces phone to load fresh code by using a URL path it has never seen before.
+  const uploadUrl = `${window.location.origin}/#/magic/${eventId || 'demo'}?t=${Date.now()}`;
 
-  // 1. REAL DATA CONNECTION
   useEffect(() => {
+    // 1. REAL DATA
     if (eventId && eventId !== 'demo') {
       const q = query(collection(db, 'photos'), where('eventId', '==', eventId), orderBy('createdAt', 'desc'), limit(50));
       const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -42,8 +41,8 @@ const EventWall: React.FC = () => {
     }
   }, [eventId]);
 
-  // 2. DEMO MODE SIMULATION
   useEffect(() => {
+    // 2. DEMO MODE
     if (eventId && eventId !== 'demo') return;
     const interval = setInterval(() => {
       setPhotos(prev => {
@@ -60,7 +59,6 @@ const EventWall: React.FC = () => {
       
       {/* LEFT SIDE: PHOTO WALL */}
       <div className="flex-1 flex flex-col h-full relative">
-         {/* Top Header */}
          <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-black via-black/80 to-transparent z-20 flex items-center justify-between px-8">
             <div className="flex items-center gap-3">
                <div className="bg-indigo-600 p-2 rounded-lg shadow-lg shadow-indigo-500/20"><Camera size={28} className="text-white"/></div>
@@ -70,8 +68,7 @@ const EventWall: React.FC = () => {
                <Wifi size={14} /> ONLINE
             </div>
          </div>
-
-         {/* Masonry Grid */}
+         
          <div className="flex-1 overflow-y-auto p-6 pt-28 no-scrollbar">
             <Masonry breakpointCols={{default: 3, 1600: 3, 1200: 2, 700: 2, 500: 1}} className="flex -ml-6 w-auto" columnClassName="pl-6 bg-clip-padding">
                <AnimatePresence mode='popLayout'>
@@ -86,8 +83,8 @@ const EventWall: React.FC = () => {
                </AnimatePresence>
             </Masonry>
          </div>
-
-         {/* Mobile Footer (Fallback QR) */}
+         
+         {/* Mobile Footer */}
          <div className="md:hidden h-24 bg-slate-900 border-t border-slate-800 flex items-center justify-between px-6 z-30">
              <div className="flex items-center gap-4">
                  <div className="bg-white p-1.5 rounded-lg"><QRCodeSVG value={uploadUrl} size={50} /></div>
@@ -96,17 +93,17 @@ const EventWall: React.FC = () => {
          </div>
       </div>
       
-      {/* RIGHT SIDE: SIDEBAR (DESKTOP ONLY) */}
+      {/* RIGHT SIDE: SIDEBAR */}
       <div className="hidden md:flex w-96 bg-slate-900 border-l border-slate-800 flex-col items-center justify-center p-8 text-center relative z-30 shadow-2xl">
          <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-600/20 rounded-full blur-[100px] pointer-events-none"></div>
          <div className="relative z-10 w-full flex flex-col items-center">
              
-             {/* QR Code Container */}
+             {/* QR Container */}
              <div className="bg-white p-4 rounded-3xl shadow-2xl mb-4 transform hover:scale-105 transition-transform duration-300">
                 <QRCodeSVG value={uploadUrl} size={200} />
              </div>
              
-             {/* DEBUG: Visual URL check */}
+             {/* DEBUG: VERIFY LINK HERE */}
              <div className="w-full mb-6 bg-slate-800 p-2 rounded text-[10px] text-slate-400 font-mono break-all border border-slate-700">
                 {uploadUrl}
              </div>
