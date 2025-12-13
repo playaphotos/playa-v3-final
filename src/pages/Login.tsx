@@ -1,124 +1,74 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Camera, ArrowRight, Lock, Mail, User, Briefcase, Hash } from 'lucide-react';
+import { useNavigate, Link } from 'react-router-dom';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../lib/firebase'; // <--- Real Auth
+import { Mail, Lock, Loader2, AlertCircle } from 'lucide-react';
 
-const Login: React.FC = () => {
+const Login = () => {
   const navigate = useNavigate();
-  const [userType, setUserType] = useState<'guest' | 'agency'>('agency');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [eventCode, setEventCode] = useState('');
+  const [error, setError] = useState('');
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    
-    setTimeout(() => {
-      setLoading(false);
-      if (userType === 'agency') {
-        navigate('/admin/dashboard');
+    setError('');
+
+    try {
+      // 1. Attempt Real Firebase Login
+      await signInWithEmailAndPassword(auth, email, password);
+      // 2. Success
+      navigate('/admin/dashboard');
+    } catch (err: any) {
+      console.error(err);
+      // 3. Handle Errors
+      if (err.code === 'auth/invalid-credential') {
+         setError('Incorrect email or password.');
       } else {
-        // Guest Logic: Redirect to the Gallery URL using the Event Code
-        // Example: If code is "DEMO", go to /gallery/demo
-        const target = eventCode ? `/gallery/${eventCode.toLowerCase()}` : '/';
-        navigate(target); 
+         setError('Login failed. Please try again.');
       }
-    }, 1500);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex flex-col md:flex-row font-sans text-white">
-      
-      {/* LEFT SIDE (Visuals) */}
-      <div className="hidden md:flex md:w-1/2 bg-indigo-900 relative items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-900 to-purple-900 opacity-90"></div>
-        <img src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&q=80&w=1000" alt="Event" className="absolute inset-0 w-full h-full object-cover mix-blend-overlay opacity-50"/>
-        <div className="relative z-10 max-w-md px-12 text-center">
-            <div className="w-16 h-16 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center mx-auto mb-8 border border-white/20">
-                <Camera size={32} className="text-white" />
-            </div>
-            <h2 className="text-4xl font-bold mb-6">Capture the moment.<br/>Relive it forever.</h2>
-        </div>
+    <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md">
+        <h2 className="mt-6 text-center text-3xl font-extrabold text-slate-900">Sign in to your account</h2>
       </div>
 
-      {/* RIGHT SIDE (Form) */}
-      <div className="flex-1 flex items-center justify-center p-8 bg-slate-950">
-         <div className="w-full max-w-md">
-            
-            <div className="text-center mb-10">
-               <Link to="/" className="inline-flex items-center gap-2 text-indigo-400 font-bold mb-8 hover:text-white transition-colors">
-                  <Camera size={20}/> Playa Photos
-               </Link>
-               <h1 className="text-3xl font-bold mb-2">Welcome Back</h1>
-               <p className="text-slate-400">
-                 {userType === 'agency' ? 'Log in to manage your events.' : 'Enter your event code to find photos.'}
-               </p>
-            </div>
-
-            {/* TOGGLE */}
-            <div className="bg-slate-900 p-1 rounded-xl flex mb-8 border border-slate-800">
-               <button onClick={() => setUserType('agency')} className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg text-sm font-bold transition-all ${userType === 'agency' ? 'bg-slate-800 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}>
-                  <Briefcase size={16}/> Photographer
-               </button>
-               <button onClick={() => setUserType('guest')} className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg text-sm font-bold transition-all ${userType === 'guest' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}>
-                  <User size={16}/> Event Guest
-               </button>
-            </div>
-
-            <form onSubmit={handleLogin} className="space-y-5">
-               
-               {/* AGENCY FORM */}
-               {userType === 'agency' && (
-                 <>
-                   <div>
-                      <label className="block text-sm font-bold text-slate-400 mb-2">Email Address</label>
-                      <div className="relative">
-                         <input type="email" placeholder="name@company.com" className="w-full bg-slate-900 border border-slate-800 rounded-xl py-4 pl-12 pr-4 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500" required />
-                         <Mail className="absolute left-4 top-4 text-slate-500" size={20}/>
-                      </div>
-                   </div>
-                   <div>
-                      <label className="block text-sm font-bold text-slate-400 mb-2">Password</label>
-                      <div className="relative">
-                         <input type="password" placeholder="••••••••" className="w-full bg-slate-900 border border-slate-800 rounded-xl py-4 pl-12 pr-4 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500" required />
-                         <Lock className="absolute left-4 top-4 text-slate-500" size={20}/>
-                      </div>
-                      <div className="text-right mt-2">
-                         <Link to="/forgot-password" className="text-xs text-indigo-400 hover:text-white">Forgot password?</Link>
-                      </div>
-                   </div>
-                 </>
-               )}
-
-               {/* GUEST FORM */}
-               {userType === 'guest' && (
-                 <div>
-                    <label className="block text-sm font-bold text-slate-400 mb-2">Event Code</label>
-                    <div className="relative">
-                       <input 
-                         type="text" 
-                         placeholder="e.g. GALA2025" 
-                         value={eventCode}
-                         onChange={(e) => setEventCode(e.target.value.toUpperCase())}
-                         className="w-full bg-slate-900 border border-slate-800 rounded-xl py-4 pl-12 pr-4 text-white font-mono text-lg tracking-widest uppercase focus:outline-none focus:ring-2 focus:ring-indigo-500" 
-                         required 
-                       />
-                       <Hash className="absolute left-4 top-4 text-slate-500" size={20}/>
-                    </div>
-                    <p className="text-xs text-slate-500 mt-2">The code is usually provided on signs at the event.</p>
-                 </div>
-               )}
-
-               <button type="submit" disabled={loading} className="w-full py-4 bg-white text-slate-900 font-bold rounded-xl hover:bg-slate-200 transition-colors flex items-center justify-center gap-2 mt-4">
-                  {loading ? 'Processing...' : (userType === 'agency' ? 'Sign In' : 'Find Photos')} <ArrowRight size={20}/>
-               </button>
-            </form>
-
-            {userType === 'agency' && (
-                <p className="text-center text-slate-500 mt-8 text-sm">
-                   Don't have an account? <Link to="/agency" className="text-indigo-400 font-bold hover:text-white">Start Free Trial</Link>
-                </p>
+      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+          <form className="space-y-6" onSubmit={handleLogin}>
+            {error && (
+              <div className="bg-red-50 text-red-600 p-3 rounded-md text-sm flex items-center gap-2">
+                <AlertCircle size={16}/> {error}
+              </div>
             )}
-         </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700">Email address</label>
+              <div className="mt-1 relative rounded-md shadow-sm">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><Mail className="text-slate-400" size={16}/></div>
+                <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-slate-300 rounded-md py-2" />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-700">Password</label>
+              <div className="mt-1 relative rounded-md shadow-sm">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><Lock className="text-slate-400" size={16}/></div>
+                <input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-slate-300 rounded-md py-2" />
+              </div>
+            </div>
+
+            <button type="submit" disabled={loading} className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-slate-900 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50">
+              {loading ? <Loader2 className="animate-spin" size={20}/> : 'Sign in'}
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );
