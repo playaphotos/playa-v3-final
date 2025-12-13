@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { HashRouter, Routes, Route, Navigate, Link } from 'react-router-dom';
 import { RoutePaths } from './types';
 import { PublicLayout, AppLayout } from './components/Layouts';
@@ -20,9 +20,6 @@ import Pricing from './pages/Pricing';
 import EventWall from './pages/EventWall';       
 import MobileUpload from './pages/MobileUpload'; 
 
-// --- GALLERY (Disabled to prevent White Screen Crash) ---
-// import EventGallery from './pages/EventGallery'; 
-
 // --- ADMIN PAGES ---
 import Dashboard from './pages/admin/Dashboard';
 import EventsManager from './pages/admin/EventsManager';
@@ -30,7 +27,25 @@ import EventUploadManager from './pages/admin/EventUploadManager';
 import Documentation from './pages/admin/Documentation';
 import AdminSettings from './pages/admin/Settings';
 
-// AGENCY LAYOUT WRAPPER
+// CURRENT VERSION - CHANGE THIS TO FORCE UPDATES
+const APP_VERSION = '4.5';
+
+const VersionEnforcer = () => {
+  useEffect(() => {
+    const storedVersion = localStorage.getItem('app_version');
+    if (storedVersion !== APP_VERSION) {
+      console.log(`New version detected: ${APP_VERSION}. Clearing cache...`);
+      // 1. Clear Local Storage
+      localStorage.clear();
+      // 2. Set new version
+      localStorage.setItem('app_version', APP_VERSION);
+      // 3. Force Hard Reload from Server (Bypasses Cache)
+      window.location.reload();
+    }
+  }, []);
+  return null;
+};
+
 const AgencyLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <div className="flex h-screen bg-slate-50">
     <div className="w-64 bg-slate-900 h-full flex flex-col text-white">
@@ -52,9 +67,10 @@ const AgencyLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => 
 const App: React.FC = () => {
   return (
     <CartProvider>
-      {/* VERSION BANNER */}
-      <div className="fixed top-0 left-0 right-0 z-[9999] bg-blue-600 text-white text-[10px] font-bold text-center pointer-events-none opacity-80">
-        SYSTEM V4.3 - MOBILE CACHE BUSTER ACTIVE
+      <VersionEnforcer />
+      
+      <div className="fixed top-0 left-0 right-0 z-[9999] bg-red-600 text-white text-[10px] font-bold text-center pointer-events-none opacity-80">
+        SYSTEM V{APP_VERSION} - CACHE ENFORCER ACTIVE
       </div>
       
       <HashRouter>
@@ -69,21 +85,12 @@ const App: React.FC = () => {
           <Route path={RoutePaths.PRICING} element={<PublicLayout><Pricing /></PublicLayout>} />
           <Route path={RoutePaths.FEATURES} element={<PublicLayout><Features /></PublicLayout>} />
           
-          {/* CORE EVENT APPS */}
+          {/* CORE ROUTES - Changed to /snap/ to be absolutely unique */}
           <Route path="/view/:eventId" element={<EventWall />} />
           <Route path="/view/demo" element={<EventWall />} />
-          
-          {/* NEW ROUTE: /post/ instead of /upload/ to force new code load */}
-          <Route path="/post/:eventId" element={<MobileUpload />} />
+          <Route path="/snap/:eventId" element={<MobileUpload />} />
 
-          {/* GALLERY (Disabled) */}
-          {/* <Route path={RoutePaths.APP_GALLERY} element={<AppLayout><EventGallery /></AppLayout>} /> */}
-          {/* <Route path={RoutePaths.EVENT_SLUG} element={<AppLayout><EventGallery /></AppLayout>} /> */}
-          
-          <Route path="/success" element={<PublicLayout><Success /></PublicLayout>} />
-          <Route path={RoutePaths.CHECKOUT_SUCCESS} element={<PublicLayout><Success /></PublicLayout>} />
-
-          {/* ADMIN SUITE */}
+          {/* ADMIN */}
           <Route path={RoutePaths.ADMIN_DASHBOARD} element={<AgencyLayout><Dashboard /></AgencyLayout>} />
           <Route path={RoutePaths.ADMIN_EVENTS} element={<AgencyLayout><EventsManager /></AgencyLayout>} />
           <Route path={RoutePaths.ADMIN_EVENT_DETAIL} element={<AgencyLayout><EventUploadManager /></AgencyLayout>} />
@@ -92,8 +99,8 @@ const App: React.FC = () => {
           
           {/* FALLBACKS */}
           <Route path="/live/*" element={<Navigate to="/view/demo" replace />} />
-          <Route path="/upload/*" element={<Navigate to="/post/demo" replace />} />
-          <Route path="/selfie" element={<Navigate to="/" replace />} />
+          <Route path="/upload/*" element={<Navigate to="/snap/demo" replace />} />
+          <Route path="/post/*" element={<Navigate to="/snap/demo" replace />} />
           <Route path="*" element={<Navigate to={RoutePaths.HOME} replace />} />
         </Routes>
       </HashRouter>
