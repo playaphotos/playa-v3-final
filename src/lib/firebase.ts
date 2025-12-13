@@ -3,14 +3,34 @@ import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 import { getAuth } from 'firebase/auth';
 
-// HELPER: Try both Vite (import.meta.env) and React (process.env) prefixes
+// CRASH-PROOF ENV LOADER
 const getEnv = (key: string) => {
-  // @ts-ignore
-  if (typeof import.meta !== 'undefined' && import.meta.env) {
+  let value = '';
+
+  // 1. Try Vite (Modern Vercel)
+  try {
     // @ts-ignore
-    return import.meta.env[`VITE_${key}`] || import.meta.env[`REACT_APP_${key}`];
+    if (typeof import.meta !== 'undefined' && import.meta.env) {
+      // @ts-ignore
+      value = import.meta.env[`VITE_${key}`] || import.meta.env[`REACT_APP_${key}`] || '';
+    }
+  } catch (e) {
+    // Ignore error
   }
-  return process.env[`REACT_APP_${key}`];
+
+  // 2. Try Standard React (Create-React-App)
+  // Only check 'process' if we haven't found a value yet to avoid ReferenceError
+  if (!value) {
+    try {
+      if (typeof process !== 'undefined' && process.env) {
+        value = process.env[`REACT_APP_${key}`] || '';
+      }
+    } catch (e) {
+      // Ignore error
+    }
+  }
+  
+  return value;
 };
 
 const firebaseConfig = {
@@ -22,9 +42,9 @@ const firebaseConfig = {
   appId: getEnv('FIREBASE_APP_ID')
 };
 
-// DEBUG: Log if keys are missing (Check your browser console)
+// SAFETY CHECK: Prevent empty config crash
 if (!firebaseConfig.apiKey) {
-  console.error("CRITICAL: Firebase API Key is missing! Check Vercel Env Vars.");
+  console.warn("Firebase Config missing. App may not function correctly.");
 }
 
 const app = initializeApp(firebaseConfig);
