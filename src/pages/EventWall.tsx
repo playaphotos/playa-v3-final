@@ -25,12 +25,11 @@ const EventWall: React.FC = () => {
     demoPhotos.map((url, i) => ({ id: `init-${i}`, url }))
   );
 
-  // Dynamic QR Code pointing to the upload route
-  // Added timestamp '?t=' to force the phone to ignore cache and load fresh
-  const uploadUrl = `${window.location.origin}/#/upload/${eventId || 'demo'}?t=${Date.now()}`;
+  // CACHE BUSTER: Pointing to /post/ instead of /upload/
+  // The 't=' parameter forces the phone to treat this as a brand new link
+  const uploadUrl = `${window.location.origin}/#/post/${eventId || 'demo'}?t=${Date.now()}`;
 
   useEffect(() => {
-    // REAL DATA CONNECTION
     if (eventId && eventId !== 'demo') {
       const q = query(collection(db, 'photos'), where('eventId', '==', eventId), orderBy('createdAt', 'desc'), limit(50));
       const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -42,7 +41,6 @@ const EventWall: React.FC = () => {
   }, [eventId]);
 
   useEffect(() => {
-    // DEMO MODE (Inject fake photos every 5s if in demo)
     if (eventId && eventId !== 'demo') return;
     const interval = setInterval(() => {
       setPhotos(prev => {
@@ -56,8 +54,6 @@ const EventWall: React.FC = () => {
 
   return (
     <div className="h-screen bg-black text-white overflow-hidden flex font-sans">
-      
-      {/* LEFT SIDE: SCROLLING MASONRY WALL */}
       <div className="flex-1 flex flex-col h-full relative">
          <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-black via-black/80 to-transparent z-20 flex items-center justify-between px-8">
             <div className="flex items-center gap-3">
@@ -82,7 +78,6 @@ const EventWall: React.FC = () => {
                </AnimatePresence>
             </Masonry>
          </div>
-         {/* MOBILE FOOTER (Fallback) */}
          <div className="md:hidden h-24 bg-slate-900 border-t border-slate-800 flex items-center justify-between px-6 z-30">
              <div className="flex items-center gap-4">
                  <div className="bg-white p-1.5 rounded-lg"><QRCodeSVG value={uploadUrl} size={50} /></div>
@@ -90,8 +85,6 @@ const EventWall: React.FC = () => {
              </div>
          </div>
       </div>
-      
-      {/* RIGHT SIDE: SIDEBAR (DESKTOP ONLY) */}
       <div className="hidden md:flex w-96 bg-slate-900 border-l border-slate-800 flex-col items-center justify-center p-8 text-center relative z-30 shadow-2xl">
          <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-600/20 rounded-full blur-[100px] pointer-events-none"></div>
          <div className="relative z-10">

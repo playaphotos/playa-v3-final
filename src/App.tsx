@@ -20,7 +20,7 @@ import Pricing from './pages/Pricing';
 import EventWall from './pages/EventWall';       
 import MobileUpload from './pages/MobileUpload'; 
 
-// --- SUSPECT FILE (Commented out to stop crash) ---
+// --- GALLERY (Disabled to prevent White Screen Crash) ---
 // import EventGallery from './pages/EventGallery'; 
 
 // --- ADMIN PAGES ---
@@ -30,7 +30,7 @@ import EventUploadManager from './pages/admin/EventUploadManager';
 import Documentation from './pages/admin/Documentation';
 import AdminSettings from './pages/admin/Settings';
 
-// INTERNAL AGENCY LAYOUT
+// AGENCY LAYOUT WRAPPER
 const AgencyLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <div className="flex h-screen bg-slate-50">
     <div className="w-64 bg-slate-900 h-full flex flex-col text-white">
@@ -52,9 +52,9 @@ const AgencyLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => 
 const App: React.FC = () => {
   return (
     <CartProvider>
-      {/* VERSION BANNER: PROVES NEW CODE IS RUNNING */}
-      <div className="fixed top-0 left-0 right-0 z-[9999] bg-purple-600 text-white text-[10px] font-bold text-center pointer-events-none opacity-80">
-        SYSTEM V4.2 - CRASH DIAGNOSTIC MODE
+      {/* VERSION BANNER */}
+      <div className="fixed top-0 left-0 right-0 z-[9999] bg-blue-600 text-white text-[10px] font-bold text-center pointer-events-none opacity-80">
+        SYSTEM V4.3 - MOBILE CACHE BUSTER ACTIVE
       </div>
       
       <HashRouter>
@@ -69,12 +69,14 @@ const App: React.FC = () => {
           <Route path={RoutePaths.PRICING} element={<PublicLayout><Pricing /></PublicLayout>} />
           <Route path={RoutePaths.FEATURES} element={<PublicLayout><Features /></PublicLayout>} />
           
-          {/* CORE EVENT APPS (Using /view/ to break cache) */}
+          {/* CORE EVENT APPS */}
           <Route path="/view/:eventId" element={<EventWall />} />
           <Route path="/view/demo" element={<EventWall />} />
-          <Route path="/upload/:eventId" element={<MobileUpload />} />
+          
+          {/* NEW ROUTE: /post/ instead of /upload/ to force new code load */}
+          <Route path="/post/:eventId" element={<MobileUpload />} />
 
-          {/* GALLERY (Disabled to test crash) */}
+          {/* GALLERY (Disabled) */}
           {/* <Route path={RoutePaths.APP_GALLERY} element={<AppLayout><EventGallery /></AppLayout>} /> */}
           {/* <Route path={RoutePaths.EVENT_SLUG} element={<AppLayout><EventGallery /></AppLayout>} /> */}
           
@@ -90,6 +92,7 @@ const App: React.FC = () => {
           
           {/* FALLBACKS */}
           <Route path="/live/*" element={<Navigate to="/view/demo" replace />} />
+          <Route path="/upload/*" element={<Navigate to="/post/demo" replace />} />
           <Route path="/selfie" element={<Navigate to="/" replace />} />
           <Route path="*" element={<Navigate to={RoutePaths.HOME} replace />} />
         </Routes>

@@ -10,14 +10,14 @@ const MobileUpload: React.FC = () => {
   const { eventId } = useParams();
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [status, setStatus] = useState('idle'); // idle, uploading, success, error
+  const [status, setStatus] = useState('idle'); 
   const [errorMsg, setErrorMsg] = useState('');
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [eventName, setEventName] = useState('Loading...');
 
-  // FORCE SUCCESS: Never show "Event Not Found"
   useEffect(() => {
+    // FORCE SUCCESS: Never show "Event Not Found"
     const safeId = (eventId || 'demo').toLowerCase();
     setEventName(safeId === 'demo' ? 'Summer Gala 2025 (Demo)' : `Event: ${safeId}`);
   }, [eventId]);
@@ -36,13 +36,10 @@ const MobileUpload: React.FC = () => {
     
     try {
       const safeId = eventId || 'demo';
-      
-      // 1. Storage Upload
       const storageRef = ref(storage, `events/${safeId}/${Date.now()}_${file.name}`);
       const snapshot = await uploadBytes(storageRef, file);
       const downloadURL = await getDownloadURL(snapshot.ref);
 
-      // 2. Database Record
       await addDoc(collection(db, 'photos'), {
         eventId: safeId,
         url: downloadURL,
@@ -53,13 +50,9 @@ const MobileUpload: React.FC = () => {
       });
 
       setStatus('success');
-      
-      // 3. Clean up and Redirect to the NEW View URL
       setTimeout(() => {
-         setFile(null); 
-         setPreview(null); 
-         setStatus('idle');
-         // REDIRECT TO THE WALL
+         setFile(null); setPreview(null); setStatus('idle');
+         // Redirect to the wall so user sees their photo
          navigate(`/view/${safeId}`);
       }, 3000);
 
@@ -82,8 +75,8 @@ const MobileUpload: React.FC = () => {
       </div>
 
       {/* VERSION BANNER */}
-      <div className="bg-indigo-600 text-white text-[10px] p-1 text-center font-mono font-bold tracking-widest">
-         UPLOAD V4.1 (READY)
+      <div className="bg-blue-600 text-white text-[10px] p-1 text-center font-mono font-bold tracking-widest">
+         UPLOAD V4.3 (READY)
       </div>
 
       <div className="flex-1 flex flex-col items-center justify-center p-6 relative">
