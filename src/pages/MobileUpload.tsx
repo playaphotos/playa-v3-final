@@ -10,14 +10,14 @@ const MobileUpload: React.FC = () => {
   const { eventId } = useParams();
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [status, setStatus] = useState('idle'); 
+  const [status, setStatus] = useState('idle'); // idle, uploading, success, error
   const [errorMsg, setErrorMsg] = useState('');
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [eventName, setEventName] = useState('Loading...');
 
+  // FORCE SUCCESS: Never show "Event Not Found"
   useEffect(() => {
-    // FORCE SUCCESS: Never show "Event Not Found"
     const safeId = (eventId || 'demo').toLowerCase();
     setEventName(safeId === 'demo' ? 'Summer Gala 2025 (Demo)' : `Event: ${safeId}`);
   }, [eventId]);
@@ -36,10 +36,13 @@ const MobileUpload: React.FC = () => {
     
     try {
       const safeId = eventId || 'demo';
+      
+      // 1. Storage Upload
       const storageRef = ref(storage, `events/${safeId}/${Date.now()}_${file.name}`);
       const snapshot = await uploadBytes(storageRef, file);
       const downloadURL = await getDownloadURL(snapshot.ref);
 
+      // 2. Database Record
       await addDoc(collection(db, 'photos'), {
         eventId: safeId,
         url: downloadURL,
@@ -50,8 +53,14 @@ const MobileUpload: React.FC = () => {
       });
 
       setStatus('success');
+      
+      // 3. Clean up and Redirect to the NEW View URL
       setTimeout(() => {
-         setFile(null); setPreview(null); setStatus('idle');
+         setFile(null); 
+         setPreview(null); 
+         setStatus('idle');
+         // REDIRECT TO THE WALL
+         navigate(`/view/${safeId}`);
       }, 3000);
 
     } catch (error: any) {
@@ -72,9 +81,9 @@ const MobileUpload: React.FC = () => {
          <div className="w-10"></div>
       </div>
 
-      {/* VERSION CONFIRMATION */}
-      <div className="bg-green-600 text-white text-[10px] p-1 text-center font-mono">
-         SYSTEM V4.0 (ACTIVE)
+      {/* VERSION BANNER */}
+      <div className="bg-indigo-600 text-white text-[10px] p-1 text-center font-mono font-bold tracking-widest">
+         UPLOAD V4.1 (READY)
       </div>
 
       <div className="flex-1 flex flex-col items-center justify-center p-6 relative">
@@ -123,7 +132,7 @@ const MobileUpload: React.FC = () => {
                      <CheckCircle size={64} className="text-white" />
                   </div>
                   <h2 className="text-4xl font-bold mb-4">Sent!</h2>
-                  <button onClick={() => setStatus('idle')} className="mt-8 text-indigo-400 font-bold">Upload Another</button>
+                  <p className="text-slate-400">Redirecting to Wall...</p>
                </motion.div>
             )}
          </AnimatePresence>
