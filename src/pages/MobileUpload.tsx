@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Camera, Upload as UploadIcon, CheckCircle, ArrowLeft, Image as ImageIcon, X, Bug, AlertTriangle } from 'lucide-react';
+import { Camera, Upload as UploadIcon, CheckCircle, ArrowLeft, Image as ImageIcon, X, AlertTriangle } from 'lucide-react';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { storage, db } from '../lib/firebase';
@@ -10,14 +10,14 @@ const MobileUpload: React.FC = () => {
   const { eventId } = useParams();
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [status, setStatus] = useState('idle'); // idle, uploading, success, error
+  const [status, setStatus] = useState('idle'); 
   const [errorMsg, setErrorMsg] = useState('');
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [eventName, setEventName] = useState('Loading...');
 
-  // FORCE EVENT NAME
   useEffect(() => {
+    // FORCE SUCCESS: Never show "Event Not Found"
     const safeId = (eventId || 'demo').toLowerCase();
     setEventName(safeId === 'demo' ? 'Summer Gala 2025 (Demo)' : `Event: ${safeId}`);
   }, [eventId]);
@@ -36,12 +36,10 @@ const MobileUpload: React.FC = () => {
     
     try {
       const safeId = eventId || 'demo';
-      // 1. Storage
       const storageRef = ref(storage, `events/${safeId}/${Date.now()}_${file.name}`);
       const snapshot = await uploadBytes(storageRef, file);
       const downloadURL = await getDownloadURL(snapshot.ref);
 
-      // 2. Firestore
       await addDoc(collection(db, 'photos'), {
         eventId: safeId,
         url: downloadURL,
@@ -59,14 +57,12 @@ const MobileUpload: React.FC = () => {
     } catch (error: any) {
       console.error("Upload Error:", error);
       setStatus('error');
-      // Show the actual error on screen
       setErrorMsg(error.message || "Unknown error");
     }
   };
 
   return (
     <div className="min-h-screen bg-slate-950 text-white font-sans flex flex-col">
-      {/* HEADER */}
       <div className="h-16 flex items-center justify-between px-6 border-b border-slate-800 bg-slate-900/50 backdrop-blur-md sticky top-0 z-10">
          <button onClick={() => navigate(-1)} className="p-2 -ml-2 text-slate-400 hover:text-white"><ArrowLeft size={24} /></button>
          <div className="text-center">
@@ -76,9 +72,9 @@ const MobileUpload: React.FC = () => {
          <div className="w-10"></div>
       </div>
 
-      {/* VERSION BANNER (If you don't see this, you are on old code) */}
-      <div className="bg-indigo-600 text-white text-xs p-2 text-center font-bold">
-         VERCEL BUILD: V3.1 (Firebase Fixed)
+      {/* VERSION CONFIRMATION */}
+      <div className="bg-green-600 text-white text-[10px] p-1 text-center font-mono">
+         SYSTEM V4.0 (ACTIVE)
       </div>
 
       <div className="flex-1 flex flex-col items-center justify-center p-6 relative">
@@ -86,7 +82,6 @@ const MobileUpload: React.FC = () => {
             {status === 'idle' || status === 'uploading' || status === 'error' ? (
                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="w-full max-w-md flex flex-col items-center">
                   
-                  {/* ERROR MESSAGE DISPLAY */}
                   {status === 'error' && (
                     <div className="w-full bg-red-500/10 border border-red-500/50 rounded-xl p-4 mb-6 text-red-200 text-sm flex gap-3 items-start">
                        <AlertTriangle className="shrink-0 text-red-500" size={20} />
