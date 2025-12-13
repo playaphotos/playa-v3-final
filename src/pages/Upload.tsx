@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Camera, Upload as UploadIcon, CheckCircle, ArrowLeft, Image as ImageIcon, X, AlertCircle } from 'lucide-react';
+import { Camera, Upload as UploadIcon, CheckCircle, ArrowLeft, Image as ImageIcon, X, AlertCircle, Bug } from 'lucide-react';
 
 const Upload: React.FC = () => {
   const { eventId } = useParams();
@@ -12,26 +12,19 @@ const Upload: React.FC = () => {
   const [preview, setPreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [success, setSuccess] = useState(false);
-  
-  // State for Event Name
   const [eventName, setEventName] = useState<string>('Loading...');
-  const [isValid, setIsValid] = useState(true);
+
+  // DEBUG: What does the router see?
+  const debugID = eventId || "UNDEFINED";
 
   useEffect(() => {
-    // 1. Handle Demo Mode Explicitly
-    if (eventId?.toLowerCase() === 'demo') {
-      setEventName('Summer Gala 2025 (Demo)');
-      setIsValid(true);
-      return;
-    }
+    // SAFETY NET: Treat 'undefined' or empty as 'demo' for now
+    const safeId = (eventId || 'demo').toLowerCase();
 
-    // 2. Handle Real Event ID (Basic Check)
-    if (eventId) {
-      setEventName(`Event: ${eventId}`);
-      setIsValid(true);
+    if (safeId === 'demo') {
+      setEventName('Summer Gala 2025 (Demo)');
     } else {
-      setEventName('Event Not Found');
-      setIsValid(false);
+      setEventName(`Event: ${safeId}`);
     }
   }, [eventId]);
 
@@ -46,29 +39,12 @@ const Upload: React.FC = () => {
   const handleUpload = () => {
     if (!file) return;
     setUploading(true);
-    
-    // Simulate Network Request
     setTimeout(() => {
       setUploading(false);
       setSuccess(true);
-      
-      // Auto-Redirect to Live Wall
-      setTimeout(() => {
-        navigate(`/live/${eventId || 'demo'}`);
-      }, 2500);
+      setTimeout(() => navigate(`/live/${eventId || 'demo'}`), 2500);
     }, 2000);
   };
-
-  if (!isValid) {
-    return (
-      <div className="min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center p-6 text-center">
-        <AlertCircle size={64} className="text-red-500 mb-4" />
-        <h1 className="text-2xl font-bold mb-2">Event Not Found</h1>
-        <p className="text-slate-400">Please scan the QR code again.</p>
-        <button onClick={() => navigate('/')} className="mt-8 text-indigo-400 font-bold">Go Home</button>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-slate-950 text-white font-sans flex flex-col">
@@ -85,14 +61,16 @@ const Upload: React.FC = () => {
          <div className="w-10"></div>
       </div>
 
+      {/* DEBUG STRIP (Remove later) */}
+      <div className="bg-yellow-900/30 text-yellow-200 text-xs p-2 text-center border-b border-yellow-900/50 flex items-center justify-center gap-2">
+         <Bug size={12}/> Debug: URL ID is [{debugID}]
+      </div>
+
       {/* MAIN CONTENT */}
       <div className="flex-1 flex flex-col items-center justify-center p-6 relative">
          <AnimatePresence>
             {!success ? (
-               <motion.div 
-                 initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                 className="w-full max-w-md flex flex-col items-center"
-               >
+               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="w-full max-w-md flex flex-col items-center">
                   {!preview ? (
                      <>
                         <div className="w-24 h-24 bg-slate-900 rounded-full flex items-center justify-center mb-8 border-2 border-dashed border-slate-700 animate-pulse">
@@ -116,15 +94,8 @@ const Upload: React.FC = () => {
                            <img src={preview} alt="Preview" className="w-full h-full object-cover" />
                            <button onClick={() => { setFile(null); setPreview(null); }} className="absolute top-4 right-4 bg-black/50 text-white p-2 rounded-full backdrop-blur-md border border-white/20"><X size={20} /></button>
                         </div>
-
                         <button onClick={handleUpload} disabled={uploading} className="w-full py-5 bg-green-500 text-white font-bold rounded-2xl hover:bg-green-400 shadow-xl shadow-green-500/20 flex items-center justify-center gap-3 text-lg transform active:scale-95 transition-all disabled:opacity-50">
-                           {uploading ? (
-                             <span className="flex items-center gap-2">
-                               <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Uploading...
-                             </span>
-                           ) : (
-                             <> <UploadIcon size={24} /> Send to Screen</>
-                           )}
+                           {uploading ? 'Uploading...' : <><UploadIcon size={24} /> Send to Screen</>}
                         </button>
                      </div>
                   )}
