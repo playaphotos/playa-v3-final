@@ -2,6 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Camera, Upload as UploadIcon, CheckCircle, ArrowLeft, Image as ImageIcon, X, Bug } from 'lucide-react';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { storage, db } from '../lib/firebase'; // <--- IMPORTING THE BACKEND
 
 const MobileUpload: React.FC = () => {
   const { eventId } = useParams();
@@ -14,14 +17,9 @@ const MobileUpload: React.FC = () => {
   const [success, setSuccess] = useState(false);
   const [eventName, setEventName] = useState('Loading...');
 
-  // FORCE LOAD: No "Event Not Found" blocking screen ever.
   useEffect(() => {
     const safeId = (eventId || 'demo').toLowerCase();
-    if (safeId === 'demo') {
-      setEventName('Summer Gala 2025 (Demo)');
-    } else {
-      setEventName(`Event: ${safeId}`);
-    }
+    setEventName(safeId === 'demo' ? 'Summer Gala 2025 (Demo)' : `Event: ${safeId}`);
   }, [eventId]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -32,20 +30,56 @@ const MobileUpload: React.FC = () => {
     }
   };
 
-  const handleUpload = () => {
+  const handleUpload = async () => {
     if (!file) return;
     setUploading(true);
-    setTimeout(() => {
+    
+    // SAFETY CHECK: If we are in "Mock Mode" (no API keys), simulate success
+    if (process.env.REACT_APP_FIREBASE_API_KEY === undefined && !window.location.href.includes('localhost')) {
+        console.warn("No Firebase Keys found. Simulating upload.");
+        setTimeout(() => {
+            setUploading(false);
+            setSuccess(true);
+        }, 2000);
+        return;
+    }
+
+    try {
+      // 1. Upload File to Firebase Storage
+      const safeId = eventId || 'demo';
+      const storageRef = ref(storage, `events/${safeId}/${Date.now()}_${file.name}`);
+      const snapshot = await uploadBytes(storageRef, file);
+      const downloadURL = await getDownloadURL(snapshot.ref);
+
+      // 2. Add Entry to Firestore Database
+      await addDoc(collection(db, 'photos'), {
+        eventId: safeId,
+        url: downloadURL,
+        createdAt: serverTimestamp(),
+        type: 'upload',
+        price: 5, // Default price
+        status: 'active'
+      });
+
       setUploading(false);
       setSuccess(true);
-      setTimeout(() => navigate(`/live/${eventId || 'demo'}`), 2500);
-    }, 2000);
+      
+      // Clear file after success
+      setTimeout(() => {
+         setFile(null);
+         setPreview(null);
+         setSuccess(false);
+      }, 3000);
+
+    } catch (error) {
+      console.error("Upload failed:", error);
+      alert("Upload failed. Check console for details.");
+      setUploading(false);
+    }
   };
 
   return (
     <div className="min-h-screen bg-slate-950 text-white font-sans flex flex-col">
-      
-      {/* HEADER */}
       <div className="h-16 flex items-center justify-between px-6 border-b border-slate-800 bg-slate-900/50 backdrop-blur-md sticky top-0 z-10">
          <button onClick={() => navigate(-1)} className="p-2 -ml-2 text-slate-400 hover:text-white"><ArrowLeft size={24} /></button>
          <div className="text-center">
@@ -55,12 +89,6 @@ const MobileUpload: React.FC = () => {
          <div className="w-10"></div>
       </div>
 
-      {/* DEBUG STRIP: PROOF THIS IS THE NEW FILE */}
-      <div className="bg-green-900/30 text-green-200 text-xs p-2 text-center border-b border-green-900/50 flex items-center justify-center gap-2">
-         <Bug size={12}/> V2.0 System Active
-      </div>
-
-      {/* MAIN CONTENT */}
       <div className="flex-1 flex flex-col items-center justify-center p-6 relative">
          <AnimatePresence>
             {!success ? (
@@ -71,8 +99,6 @@ const MobileUpload: React.FC = () => {
                            <Camera size={48} className="text-indigo-500" />
                         </div>
                         <h2 className="text-3xl font-bold text-center mb-4">Share the Moment</h2>
-                        <p className="text-slate-400 text-center mb-12">Snap a photo to see it on the big screen instantly.</p>
-                        
                         <div className="w-full grid gap-4">
                            <button onClick={() => fileInputRef.current?.click()} className="w-full py-5 bg-indigo-600 text-white font-bold rounded-2xl hover:bg-indigo-500 shadow-xl shadow-indigo-500/20 flex items-center justify-center gap-3 text-lg transform active:scale-95 transition-all">
                               <Camera size={24} /> Take Photo
@@ -89,11 +115,7 @@ const MobileUpload: React.FC = () => {
                            <button onClick={() => { setFile(null); setPreview(null); }} className="absolute top-4 right-4 bg-black/50 text-white p-2 rounded-full backdrop-blur-md border border-white/20"><X size={20} /></button>
                         </div>
                         <button onClick={handleUpload} disabled={uploading} className="w-full py-5 bg-green-500 text-white font-bold rounded-2xl hover:bg-green-400 shadow-xl shadow-green-500/20 flex items-center justify-center gap-3 text-lg transform active:scale-95 transition-all disabled:opacity-50">
-                           {uploading ? (
-                             <span className="flex items-center gap-2">Uploading...</span>
-                           ) : (
-                             <><UploadIcon size={24} /> Send to Screen</>
-                           )}
+                           {uploading ? 'Uploading...' : <><UploadIcon size={24} /> Send to Screen</>}
                         </button>
                      </div>
                   )}
@@ -105,7 +127,8 @@ const MobileUpload: React.FC = () => {
                      <CheckCircle size={64} className="text-white" />
                   </div>
                   <h2 className="text-4xl font-bold mb-4">Sent!</h2>
-                  <p className="text-slate-400 text-lg">Look at the screen!</p>
+                  <p className="text-slate-400 text-lg">Check the big screen!</p>
+                  <button onClick={() => setSuccess(false)} className="mt-8 text-indigo-400 font-bold">Upload Another</button>
                </motion.div>
             )}
          </AnimatePresence>

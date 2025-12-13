@@ -1,43 +1,25 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
-import { getFunctions } from 'firebase/functions';
-import { getAnalytics } from "firebase/analytics";
+import { getAuth } from 'firebase/auth';
 
-// HARDCODED CONFIGURATION
-// Used to prevent startup crashes in preview environments where .env variables fail to load.
+// 1. You will replace these with your REAL keys from the Firebase Console later.
+// For now, these are placeholders so the app compiles without crashing.
 const firebaseConfig = {
-  apiKey: "AIzaSyBAfxXlPDPMGTLHZGR1l_wQpercV8f9eIc",
-  authDomain: "magicmomentsai.firebaseapp.com",
-  projectId: "magicmomentsai",
-  storageBucket: "magicmomentsai.firebasestorage.app",
-  messagingSenderId: "952652085780",
-  appId: "1:952652085780:web:51029d041fdf7179eb8501",
-  measurementId: "G-B4HZ8LMD1N"
+  apiKey: process.env.REACT_APP_FIREBASE_API_KEY || "AIzaSy_PLACEHOLDER",
+  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN || "playa-photos.firebaseapp.com",
+  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID || "playa-photos",
+  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET || "playa-photos.appspot.com",
+  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID || "123456789",
+  appId: process.env.REACT_APP_FIREBASE_APP_ID || "1:123456789:web:abcdef"
 };
 
-// Initialize Firebase
-// We wrap this in a try-catch to ensure the file doesn't halt execution if something is weird,
-// though hardcoding usually fixes the "Missing App configuration" error.
-let app;
-let analytics;
-let auth;
-let db;
-let storage;
-let functions;
+// 2. Initialize Firebase
+const app = initializeApp(firebaseConfig);
 
-try {
-  app = initializeApp(firebaseConfig);
-  analytics = getAnalytics(app);
-  auth = getAuth(app);
-  db = getFirestore(app);
-  storage = getStorage(app);
-  functions = getFunctions(app);
-} catch (e) {
-  console.error("Firebase Initialization Error:", e);
-}
+// 3. Export Services
+export const db = getFirestore(app);
+export const storage = getStorage(app);
+export const auth = getAuth(app);
 
-// Export services
-export { auth, db, storage, functions, GoogleAuthProvider };
 export default app;
