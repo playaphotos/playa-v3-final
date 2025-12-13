@@ -1,7 +1,7 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Camera, Upload as UploadIcon, CheckCircle, ArrowLeft, Image as ImageIcon, X } from 'lucide-react';
+import { Camera, Upload as UploadIcon, CheckCircle, ArrowLeft, Image as ImageIcon, X, AlertCircle } from 'lucide-react';
 
 const Upload: React.FC = () => {
   const { eventId } = useParams();
@@ -12,6 +12,28 @@ const Upload: React.FC = () => {
   const [preview, setPreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [success, setSuccess] = useState(false);
+  
+  // State for Event Name
+  const [eventName, setEventName] = useState<string>('Loading...');
+  const [isValid, setIsValid] = useState(true);
+
+  useEffect(() => {
+    // 1. Handle Demo Mode Explicitly
+    if (eventId?.toLowerCase() === 'demo') {
+      setEventName('Summer Gala 2025 (Demo)');
+      setIsValid(true);
+      return;
+    }
+
+    // 2. Handle Real Event ID (Basic Check)
+    if (eventId) {
+      setEventName(`Event: ${eventId}`);
+      setIsValid(true);
+    } else {
+      setEventName('Event Not Found');
+      setIsValid(false);
+    }
+  }, [eventId]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -24,24 +46,53 @@ const Upload: React.FC = () => {
   const handleUpload = () => {
     if (!file) return;
     setUploading(true);
+    
+    // Simulate Network Request
     setTimeout(() => {
       setUploading(false);
       setSuccess(true);
-      setTimeout(() => navigate(`/live/${eventId || 'demo'}`), 2500);
+      
+      // Auto-Redirect to Live Wall
+      setTimeout(() => {
+        navigate(`/live/${eventId || 'demo'}`);
+      }, 2500);
     }, 2000);
   };
 
+  if (!isValid) {
+    return (
+      <div className="min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center p-6 text-center">
+        <AlertCircle size={64} className="text-red-500 mb-4" />
+        <h1 className="text-2xl font-bold mb-2">Event Not Found</h1>
+        <p className="text-slate-400">Please scan the QR code again.</p>
+        <button onClick={() => navigate('/')} className="mt-8 text-indigo-400 font-bold">Go Home</button>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-slate-950 text-white font-sans flex flex-col">
-      <div className="h-16 flex items-center justify-between px-6 border-b border-slate-800">
-         <button onClick={() => navigate(-1)} className="p-2 -ml-2 text-slate-400 hover:text-white"><ArrowLeft size={24} /></button>
-         <h1 className="font-bold text-lg">Upload to Event</h1>
+      
+      {/* HEADER */}
+      <div className="h-16 flex items-center justify-between px-6 border-b border-slate-800 bg-slate-900/50 backdrop-blur-md sticky top-0 z-10">
+         <button onClick={() => navigate(-1)} className="p-2 -ml-2 text-slate-400 hover:text-white">
+            <ArrowLeft size={24} />
+         </button>
+         <div className="text-center">
+            <h1 className="font-bold text-sm text-slate-400 uppercase tracking-wider">Upload To</h1>
+            <p className="font-bold text-white text-sm truncate max-w-[200px]">{eventName}</p>
+         </div>
          <div className="w-10"></div>
       </div>
+
+      {/* MAIN CONTENT */}
       <div className="flex-1 flex flex-col items-center justify-center p-6 relative">
          <AnimatePresence>
             {!success ? (
-               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="w-full max-w-md flex flex-col items-center">
+               <motion.div 
+                 initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                 className="w-full max-w-md flex flex-col items-center"
+               >
                   {!preview ? (
                      <>
                         <div className="w-24 h-24 bg-slate-900 rounded-full flex items-center justify-center mb-8 border-2 border-dashed border-slate-700 animate-pulse">
@@ -49,6 +100,7 @@ const Upload: React.FC = () => {
                         </div>
                         <h2 className="text-3xl font-bold text-center mb-4">Share the Moment</h2>
                         <p className="text-slate-400 text-center mb-12">Snap a photo to see it on the big screen instantly.</p>
+                        
                         <div className="w-full grid gap-4">
                            <button onClick={() => fileInputRef.current?.click()} className="w-full py-5 bg-indigo-600 text-white font-bold rounded-2xl hover:bg-indigo-500 shadow-xl shadow-indigo-500/20 flex items-center justify-center gap-3 text-lg transform active:scale-95 transition-all">
                               <Camera size={24} /> Take Photo
@@ -62,10 +114,17 @@ const Upload: React.FC = () => {
                      <div className="w-full flex flex-col items-center">
                         <div className="relative w-full aspect-[3/4] rounded-2xl overflow-hidden mb-8 border border-slate-700 shadow-2xl">
                            <img src={preview} alt="Preview" className="w-full h-full object-cover" />
-                           <button onClick={() => { setFile(null); setPreview(null); }} className="absolute top-4 right-4 bg-black/50 text-white p-2 rounded-full backdrop-blur-md"><X size={20} /></button>
+                           <button onClick={() => { setFile(null); setPreview(null); }} className="absolute top-4 right-4 bg-black/50 text-white p-2 rounded-full backdrop-blur-md border border-white/20"><X size={20} /></button>
                         </div>
+
                         <button onClick={handleUpload} disabled={uploading} className="w-full py-5 bg-green-500 text-white font-bold rounded-2xl hover:bg-green-400 shadow-xl shadow-green-500/20 flex items-center justify-center gap-3 text-lg transform active:scale-95 transition-all disabled:opacity-50">
-                           {uploading ? 'Uploading...' : <><UploadIcon size={24} /> Send to Screen</>}
+                           {uploading ? (
+                             <span className="flex items-center gap-2">
+                               <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Uploading...
+                             </span>
+                           ) : (
+                             <> <UploadIcon size={24} /> Send to Screen</>
+                           )}
                         </button>
                      </div>
                   )}
@@ -73,7 +132,9 @@ const Upload: React.FC = () => {
                </motion.div>
             ) : (
                <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="text-center">
-                  <div className="w-32 h-32 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-8 shadow-[0_0_50px_rgba(34,197,94,0.6)]"><CheckCircle size={64} className="text-white" /></div>
+                  <div className="w-32 h-32 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-8 shadow-[0_0_50px_rgba(34,197,94,0.6)]">
+                     <CheckCircle size={64} className="text-white" />
+                  </div>
                   <h2 className="text-4xl font-bold mb-4">Sent!</h2>
                   <p className="text-slate-400 text-lg">Look at the screen!</p>
                </motion.div>
