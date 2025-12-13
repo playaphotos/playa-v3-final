@@ -10,7 +10,7 @@ import { db } from '../lib/firebase';
 const EventWall: React.FC = () => {
   const { eventId } = useParams();
   
-  // Stock photos for Demo Mode simulation
+  // Stock photos for Demo Mode simulation (Now disabled)
   const demoPhotos = [
     'https://images.unsplash.com/photo-1519671482538-518b5c2c681c?auto=format&fit=crop&q=80&w=800',
     'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&q=80&w=800',
@@ -33,19 +33,31 @@ const EventWall: React.FC = () => {
   const safeId = eventId || 'demo';
   const uploadUrl = `${baseUrl}/mobile.html#/magic/${safeId}`;
 
-  // 1. REAL DATA CONNECTION
+  // 1. REAL DATA CONNECTION (FIXED: NOW WORKS FOR DEMO TOO)
   useEffect(() => {
-    if (eventId && eventId !== 'demo') {
-      const q = query(collection(db, 'photos'), where('eventId', '==', eventId), orderBy('createdAt', 'desc'), limit(50));
-      const unsubscribe = onSnapshot(q, (snapshot) => {
-        const newPhotos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        if (newPhotos.length > 0) setPhotos(newPhotos);
-      });
-      return () => unsubscribe();
-    }
+    // FIX: We allow this to run even if the ID is 'demo'
+    const currentEventId = eventId || 'demo';
+
+    const q = query(
+      collection(db, 'photos'), 
+      where('eventId', '==', currentEventId), 
+      orderBy('createdAt', 'desc'), 
+      limit(50)
+    );
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const newPhotos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      // Only update if we actually found photos, otherwise keep the initial stock ones for a moment
+      if (newPhotos.length > 0) {
+        setPhotos(newPhotos);
+      }
+    });
+    return () => unsubscribe();
   }, [eventId]);
 
-  // 2. DEMO MODE SIMULATION
+  // 2. DEMO MODE SIMULATION (DISABLED)
+  // We commented this out so it doesn't overwrite your real photo with fake ones.
+  /*
   useEffect(() => {
     if (eventId && eventId !== 'demo') return;
     const interval = setInterval(() => {
@@ -57,6 +69,7 @@ const EventWall: React.FC = () => {
     }, 5000);
     return () => clearInterval(interval);
   }, [eventId]);
+  */
 
   return (
     <div className="h-screen bg-black text-white overflow-hidden flex font-sans">
