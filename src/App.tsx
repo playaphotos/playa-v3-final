@@ -5,7 +5,7 @@ import { PublicLayout, AppLayout } from './components/Layouts';
 import { CartProvider } from './contexts/CartContext';
 import { Loader2, LayoutDashboard, Image, Settings, BookOpen, LogOut } from 'lucide-react';
 
-// STANDARD IMPORTS
+// CORE IMPORTS
 import Landing from './pages/Landing';
 import AgencyLanding from './pages/AgencyLanding';
 import Login from './pages/Login';
@@ -15,8 +15,8 @@ import Terms from './pages/Terms';
 import Success from './pages/Success';
 import Features from './pages/Features';
 import Pricing from './pages/Pricing';
-import LiveWall from './pages/LiveWall';
-import MobileUpload from './pages/MobileUpload'; // <--- USING THE NEW FILE
+import EventWall from './pages/EventWall';     // <--- NEW FILE
+import MobileUpload from './pages/MobileUpload'; // <--- NEW FILE
 
 // Lazy Imports
 const EventGallery = React.lazy(() => import('./pages/EventGallery'));
@@ -65,10 +65,9 @@ const App: React.FC = () => {
           <Route path={RoutePaths.PRICING} element={<PublicLayout><Pricing /></PublicLayout>} />
           <Route path={RoutePaths.FEATURES} element={<PublicLayout><Features /></PublicLayout>} />
           
-          <Route path="/live/:eventId" element={<LiveWall />} />
-          <Route path="/live/demo" element={<LiveWall />} />
-          
-          {/* UPDATED ROUTE: Points to MobileUpload */}
+          {/* UPDATED ROUTES */}
+          <Route path="/live/:eventId" element={<EventWall />} />
+          <Route path="/live/demo" element={<EventWall />} />
           <Route path="/upload/:eventId" element={<MobileUpload />} />
 
           <Route path={RoutePaths.APP_GALLERY} element={<AppLayout><Suspense fallback={<PageLoader />}><EventGallery /></Suspense></AppLayout>} />

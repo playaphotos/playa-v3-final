@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Camera, Upload as UploadIcon, CheckCircle, ArrowLeft, Image as ImageIcon, X, AlertCircle, Bug } from 'lucide-react';
+import { Camera, Upload as UploadIcon, CheckCircle, ArrowLeft, Image as ImageIcon, X, Bug } from 'lucide-react';
 
-const Upload: React.FC = () => {
+const MobileUpload: React.FC = () => {
   const { eventId } = useParams();
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -12,15 +12,11 @@ const Upload: React.FC = () => {
   const [preview, setPreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [eventName, setEventName] = useState<string>('Loading...');
+  const [eventName, setEventName] = useState('Loading...');
 
-  // DEBUG: What does the router see?
-  const debugID = eventId || "UNDEFINED";
-
+  // FORCE LOAD: No "Event Not Found" blocking screen ever.
   useEffect(() => {
-    // SAFETY NET: Treat 'undefined' or empty as 'demo' for now
     const safeId = (eventId || 'demo').toLowerCase();
-
     if (safeId === 'demo') {
       setEventName('Summer Gala 2025 (Demo)');
     } else {
@@ -51,9 +47,7 @@ const Upload: React.FC = () => {
       
       {/* HEADER */}
       <div className="h-16 flex items-center justify-between px-6 border-b border-slate-800 bg-slate-900/50 backdrop-blur-md sticky top-0 z-10">
-         <button onClick={() => navigate(-1)} className="p-2 -ml-2 text-slate-400 hover:text-white">
-            <ArrowLeft size={24} />
-         </button>
+         <button onClick={() => navigate(-1)} className="p-2 -ml-2 text-slate-400 hover:text-white"><ArrowLeft size={24} /></button>
          <div className="text-center">
             <h1 className="font-bold text-sm text-slate-400 uppercase tracking-wider">Upload To</h1>
             <p className="font-bold text-white text-sm truncate max-w-[200px]">{eventName}</p>
@@ -61,9 +55,9 @@ const Upload: React.FC = () => {
          <div className="w-10"></div>
       </div>
 
-      {/* DEBUG STRIP (Remove later) */}
-      <div className="bg-yellow-900/30 text-yellow-200 text-xs p-2 text-center border-b border-yellow-900/50 flex items-center justify-center gap-2">
-         <Bug size={12}/> Debug: URL ID is [{debugID}]
+      {/* DEBUG STRIP: PROOF THIS IS THE NEW FILE */}
+      <div className="bg-green-900/30 text-green-200 text-xs p-2 text-center border-b border-green-900/50 flex items-center justify-center gap-2">
+         <Bug size={12}/> V2.0 System Active
       </div>
 
       {/* MAIN CONTENT */}
@@ -95,7 +89,11 @@ const Upload: React.FC = () => {
                            <button onClick={() => { setFile(null); setPreview(null); }} className="absolute top-4 right-4 bg-black/50 text-white p-2 rounded-full backdrop-blur-md border border-white/20"><X size={20} /></button>
                         </div>
                         <button onClick={handleUpload} disabled={uploading} className="w-full py-5 bg-green-500 text-white font-bold rounded-2xl hover:bg-green-400 shadow-xl shadow-green-500/20 flex items-center justify-center gap-3 text-lg transform active:scale-95 transition-all disabled:opacity-50">
-                           {uploading ? 'Uploading...' : <><UploadIcon size={24} /> Send to Screen</>}
+                           {uploading ? (
+                             <span className="flex items-center gap-2">Uploading...</span>
+                           ) : (
+                             <><UploadIcon size={24} /> Send to Screen</>
+                           )}
                         </button>
                      </div>
                   )}
@@ -115,4 +113,4 @@ const Upload: React.FC = () => {
     </div>
   );
 };
-export default Upload;
+export default MobileUpload;

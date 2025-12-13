@@ -7,7 +7,7 @@ import { Camera, Sparkles, Wifi } from 'lucide-react';
 import { collection, query, where, onSnapshot, orderBy, limit } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 
-const LiveWall: React.FC = () => {
+const EventWall: React.FC = () => {
   const { eventId } = useParams();
   
   const demoPhotos = [
@@ -25,6 +25,7 @@ const LiveWall: React.FC = () => {
     demoPhotos.map((url, i) => ({ id: `init-${i}`, url }))
   );
 
+  // Dynamic QR Code pointing to the new MobileUpload route
   const uploadUrl = `${window.location.origin}/#/upload/${eventId || 'demo'}`;
 
   useEffect(() => {
@@ -76,13 +77,9 @@ const LiveWall: React.FC = () => {
                </AnimatePresence>
             </Masonry>
          </div>
-         <div className="md:hidden h-24 bg-slate-900 border-t border-slate-800 flex items-center justify-between px-6 z-30">
-             <div className="flex items-center gap-4">
-                 <div className="bg-white p-1.5 rounded-lg"><QRCodeSVG value={uploadUrl} size={50} /></div>
-                 <div><h2 className="font-bold text-lg">Scan to Join</h2></div>
-             </div>
-         </div>
       </div>
+      
+      {/* SIDEBAR */}
       <div className="hidden md:flex w-96 bg-slate-900 border-l border-slate-800 flex-col items-center justify-center p-8 text-center relative z-30 shadow-2xl">
          <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-600/20 rounded-full blur-[100px] pointer-events-none"></div>
          <div className="relative z-10">
@@ -101,4 +98,4 @@ const LiveWall: React.FC = () => {
     </div>
   );
 };
-export default LiveWall;
+export default EventWall;
